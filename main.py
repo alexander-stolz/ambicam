@@ -114,28 +114,12 @@ class ColorGrabber(threading.Thread):
 
     def run(self):
         self.running = True
-        # last_colors = None
         try:
             while self.running:
                 _, frame = self.vid.read()
                 frame_blured = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
                 colors = self.get_colors(frame_blured)
                 self.tn.send_colors(colors)
-                if last_colors is None:
-                    sleep(config.fps.get('capture_dt', 0.1))
-                    last_colors = colors
-                else:
-                    color_steep = (array(colors) - array(last_colors)) / config.fps.get(
-                        'capture_dt'
-                    )
-                    for t in arange(
-                        0, config.fps.get('capture_dt'), config.fps.get('output_dt')
-                    ):
-                        _colors = last_colors + color_steep * t
-                        print(_colors[0])
-                        self.tn.send_colors(_colors)
-                        sleep(config.fps.get('output_dt'))
-                    last_colors = colors
         finally:
             self.running = False
             self.vid.release()
