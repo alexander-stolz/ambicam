@@ -1,0 +1,29 @@
+{
+    "resolution": {
+        "width": 640,
+        "height": 480
+    },
+    "window": {
+        "x0": 230,
+        "y0": 100,
+        "x1": 470,
+        "y1": 220
+    },
+    "divisions": {
+        "x": 9,
+        "y": 3
+    },
+    "blur": 101,
+    "telnet": {
+        "host": "192.168.1.108",
+        "port": "3636"
+    },
+    "connection": {
+        "host": "0.0.0.0",
+        "port": 5000
+    },
+    "fps": {
+        "capture_dt": 0.1,
+        "output_dt": 0.03
+    }
+}
