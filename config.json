@@ -26,6 +26,6 @@
     },
     "fps": {
         "capture_dt": 0.0,
-        "output_dt": 0.03
+        "smoothing": 3
     }
 }

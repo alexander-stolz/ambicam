@@ -120,7 +120,8 @@ class ColorGrabber(threading.Thread):
                 _, frame = self.vid.read()
                 frame_blured = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
                 colors = self.get_colors(frame_blured)
-                self.tn.send_colors(colors)
+                self.tn.colors = colors
+                sleep(config.fps.get('capture_dt'))
         finally:
             self.running = False
             self.vid.release()
