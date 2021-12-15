@@ -2,7 +2,7 @@ import json
 from types import SimpleNamespace
 from time import sleep, time
 import threading
-from numpy import arange, array
+from numpy import arange, array, linspace
 
 
 def get_config(filename='config.json'):
@@ -47,7 +47,7 @@ class TelnetConnection(threading.Thread):
             )
             + ';'
         )
-        print(self.send(cmd))
+        _ = self.send(cmd)
 
     def run(self):
         self.running = True
@@ -56,16 +56,18 @@ class TelnetConnection(threading.Thread):
         while self.running:
             if not self.new_colors:
                 continue
-            last_colors = last_colors or self.new_colors
+            last_colors = new_colors or self.new_colors
             new_colors = self.new_colors
             self.new_colors = None
-            color_steep = (array(new_colors) - array(last_colors)) / (self.dt or 0.1)
-            for t in arange(0, self.dt, config.fps.get('output_dt')):
+            color_steep = (array(new_colors, float) - array(last_colors, float)) / (
+                self.dt or 0.1
+            )
+            for t in linspace(0, self.dt, config.fps.get('smoothing')):
                 if self.new_colors:
                     break
                 _colors = last_colors + color_steep * t
                 self.send_colors(_colors)
-                sleep(config.fps.get('output_dt'))
+                sleep(self.dt / config.fps.get('smoothing'))
         self.disconnect()
 
     @property
@@ -77,7 +79,7 @@ class TelnetConnection(threading.Thread):
         self.dt = 0.1 * (time() - self.last_time) + 0.9 * self.dt
         self.last_time = time()
         self.new_colors = colors
-        print(self.dt)
+        print('\r', self.dt, end='')
 
     def stop(self):
         self.running = False

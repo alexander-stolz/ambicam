@@ -1,18 +1,53 @@
-<div>
-    '<img src="static/frame.jpg">'
-</div>
+<!DOCTYPE html>
+<html>
 
-<div>
-    <button onclick="window.location.href='/window?cmd=ll'">l-</button>
-    <button onclick="window.location.href='/window?cmd=lr'">l+</button>
-    <button onclick="window.location.href='/window?cmd=r-'">r-</button>
-    <button onclick="window.location.href='/window?cmd=r+'">r+</button>
-    <button onclick="window.location.href='/window?cmd=o-'">o-</button>
-    <button onclick="window.location.href='/window?cmd=o+'">o+</button>
-    <button onclick="window.location.href='/window?cmd=u-'">u-</button>
-    <button onclick="window.location.href='/window?cmd=u+'">u+</button>
-</div>
-<div>
-    <button onclick="window.location.href='/'">reload</button>
-    <button onclick="window.location.href='/stop'">stop</button>
-</div>
+<body>
+
+    <head>
+        <title>ambicam control</title>
+    </head>
+
+    <!-- 3x3 table -->
+    <table align="center">
+        <tr>
+            <td>
+            </td>
+            <td align="center">
+                <button onclick="window.location.href='/window?cmd=ou'">&#11015;</button>
+                <button onclick="window.location.href='/window?cmd=oo'">&#11014;</button>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button onclick="window.location.href='/window?cmd=ll'">&#11013;</button><br>
+                <button onclick="window.location.href='/window?cmd=lr'">&#10145;</button>
+            </td>
+            <td>
+                <img src="../static/frame.jpg">
+            </td>
+            <td>
+                <button onclick="window.location.href='/window?cmd=rl'">&#11013;</button><br>
+                <button onclick="window.location.href='/window?cmd=rr'">&#10145;</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td align="center">
+                <button onclick="window.location.href='/window?cmd=uu'">&#11015;</button>
+                <button onclick="window.location.href='/window?cmd=uo'">&#11014;</button>
+            </td>
+            <td>
+            </td>
+        </tr>
+    </table>
+
+    <div>
+        <button onclick="window.location.href='/'">reload</button>
+        <button onclick="window.location.href='/stop'">stop</button>
+    </div>
+</body>
+
+</html>
