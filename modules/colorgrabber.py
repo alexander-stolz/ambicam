@@ -1,7 +1,8 @@
 import cv2
 from time import sleep
 from numpy import arange, array, linspace
-from utils import get_config, TelnetConnection
+from modules.utils import get_config
+from modules.telnet import TelnetConnection
 import threading
 
 config = get_config()
@@ -62,7 +63,7 @@ class ColorGrabber(threading.Thread):
     def get_colors(self, frame, show=True):
         colors = []
         for y in linspace(
-            config.window['y1'], config.window['y0'], config.divisions['y']
+            config.window['y1'], config.window['y0'], config.ligths['left']
         ):
             colors.append(frame[int(y), int(config.window['x0'])])
             if show:
@@ -74,7 +75,7 @@ class ColorGrabber(threading.Thread):
                     10,
                 )
         for x in linspace(
-            config.window['x0'], config.window['x1'], config.divisions['x']
+            config.window['x0'], config.window['x1'], config.ligths['top']
         ):
             colors.append(frame[int(config.window['y0']), int(x)])
             if show:
@@ -86,7 +87,7 @@ class ColorGrabber(threading.Thread):
                     10,
                 )
         for y in linspace(
-            config.window['y0'], config.window['y1'], config.divisions['y']
+            config.window['y0'], config.window['y1'], config.ligths['right']
         ):
             colors.append(frame[int(y), int(config.window['x1'])])
             if show:
@@ -98,7 +99,7 @@ class ColorGrabber(threading.Thread):
                     10,
                 )
         for x in linspace(
-            config.window['x1'], config.window['x0'], config.divisions['x']
+            config.window['x1'], config.window['x0'], config.ligths['bottom']
         ):
             colors.append(frame[int(config.window['y1']), int(x)])
             if show:

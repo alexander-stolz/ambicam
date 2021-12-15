@@ -9,6 +9,12 @@
         "x1": 470,
         "y1": 220
     },
+    "lights": {
+        "top": 0,
+        "left": 0,
+        "bottom": 25,
+        "right": 0
+    },
     "divisions": {
         "x": 9,
         "y": 3
@@ -23,7 +29,7 @@
         "port": 5000
     },
     "fps": {
-        "capture_dt": 0.1,
+        "capture_dt": 0.0,
         "output_dt": 0.03
     }
 }
