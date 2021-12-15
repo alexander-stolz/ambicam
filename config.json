@@ -9,9 +9,11 @@
         "x1": 470,
         "y1": 220
     },
-    "divisions": {
-        "x": 9,
-        "y": 3
+    "lights": {
+        "top": 0,
+        "left": 0,
+        "bottom": 25,
+        "right": 0
     },
     "blur": 101,
     "telnet": {
@@ -23,7 +25,7 @@
         "port": 5000
     },
     "fps": {
-        "capture_dt": 0.1,
+        "capture_dt": 0.0,
         "output_dt": 0.03
     }
 }

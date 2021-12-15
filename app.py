@@ -4,9 +4,8 @@ from time import sleep
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from utils import get_config
-from main import ColorGrabber
-import main
+from modules.utils import get_config
+from modules.colorgrabber import ColorGrabber
 
 config = get_config()
 app = FastAPI()
@@ -39,9 +38,9 @@ def stop():
 def window(cmd: str):
     print(cmd)
     if cmd == 'll':
-        main.config.window['x0'] -= 10
+        config.window['x0'] -= 10
     if cmd == 'lr':
-        main.config.window['x0'] += 10
+        config.window['x0'] += 10
     return RedirectResponse('/')
 
 
