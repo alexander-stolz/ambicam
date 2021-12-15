@@ -15,10 +15,6 @@
         "bottom": 25,
         "right": 0
     },
-    "divisions": {
-        "x": 9,
-        "y": 3
-    },
     "blur": 101,
     "telnet": {
         "host": "192.168.1.108",
