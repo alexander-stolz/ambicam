@@ -39,6 +39,22 @@ class ColorGrabber(threading.Thread):
         self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, config.resolution['height'])
 
     @property
+    def brightness(self):
+        return self.vid.get(cv2.CAP_PROP_BRIGHTNESS)
+
+    @brightness.setter
+    def brightness(self, value):
+        self.vid.set(cv2.CAP_PROP_BRIGHTNESS, value)
+
+    @property
+    def saturation(self):
+        return self.vid.get(cv2.CAP_PROP_SATURATION)
+
+    @saturation.setter
+    def saturation(self, value):
+        self.vid.set(cv2.CAP_PROP_SATURATION, value)
+
+    @property
     def frame(self):
         if not self.running:
             return

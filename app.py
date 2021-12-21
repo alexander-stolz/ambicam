@@ -45,26 +45,55 @@ def stop():
 
 @app.get('/brightness/{brightness}')
 def brightness(brightness: float):
-    import cv2
-
-    ColorGrabber().vid.set(cv2.CAP_PROP_BRIGHTNESS, brightness)
-    brightness = ColorGrabber().vid.get(cv2.CAP_PROP_BRIGHTNESS)
-    print('\nBrightness: ', brightness)
-    config.brightness = brightness
+    ColorGrabber().brightness = brightness
+    config.brightness = ColorGrabber().brightness
     save_config()
     return RedirectResponse('/')
 
 
 @app.get('/saturation/{sat}')
 def saturation(sat: float):
-    import cv2
-
-    ColorGrabber().vid.set(cv2.CAP_PROP_SATURATION, sat)
-    sat = ColorGrabber().vid.get(cv2.CAP_PROP_SATURATION)
-    print('\nSaturation: ', sat)
-    config.saturation = sat
+    ColorGrabber().saturation = sat
+    config.saturation = ColorGrabber().saturation
     save_config()
     return RedirectResponse('/')
+
+
+@app.get('/saturation_up')
+def saturation_up():
+    ColorGrabber().saturation += 5
+    config.saturation = ColorGrabber().saturation
+    save_config()
+    return RedirectResponse('/')
+
+
+@app.get('/saturation_down')
+def saturation_up():
+    ColorGrabber().saturation -= 5
+    config.saturation = ColorGrabber().saturation
+    save_config()
+    return RedirectResponse('/')
+
+
+@app.get('/brightness_up')
+def brightness_up():
+    ColorGrabber().brightness += 5
+    config.brightness = ColorGrabber().brightness
+    save_config()
+    return RedirectResponse('/')
+
+
+@app.get('/brightness_down')
+def brightness_up():
+    ColorGrabber().brightness -= 5
+    config.brightness = ColorGrabber().brightness
+    save_config()
+    return RedirectResponse('/')
+
+
+@app.get('/dt')
+def dt():
+    return {'dt': ColorGrabber().tn.dt}
 
 
 @app.get('/window')

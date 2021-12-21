@@ -27,5 +27,6 @@
     "fps": {
         "capture_dt": 0.0,
         "smoothing": 4
-    }
+    },
+    "brightness": 100.0
 }
