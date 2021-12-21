@@ -128,7 +128,7 @@ class ColorGrabber(threading.Thread):
                 if config.blur:
                     frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
                 colors = self.get_colors(frame)
-                colors = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                # color format: BGR
                 self.tn.colors = colors
                 sleep(config.fps.get('capture_dt'))
         finally:

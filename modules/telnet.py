@@ -40,7 +40,7 @@ class TelnetConnection(threading.Thread):
         cmd = (
             'setcolor:'
             + ';'.join(
-                f'{n}-{int(c[0])},{int(c[1])},{int(c[2])}'
+                f'{n}-{int(c[2])},{int(c[1])},{int(c[0])}'
                 for n, c in enumerate(colors, start=1)
             )
             + ';'
@@ -75,7 +75,7 @@ class TelnetConnection(threading.Thread):
     @colors.setter
     def colors(self, colors):
         """
-        colors: list of RGB colors
+        colors: list of BGR colors
         """
         self.dt = 0.1 * (time() - self.last_time) + 0.9 * self.dt
         self.last_time = time()
