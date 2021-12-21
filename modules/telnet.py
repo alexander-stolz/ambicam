@@ -18,7 +18,8 @@ class TelnetConnection(threading.Thread):
         self.new_colors = None
 
     def connect(self):
-        return
+        if not config.telnet.get('host'):
+            return
         import telnetlib
 
         self.connection = telnetlib.Telnet(self.host, self.port)
