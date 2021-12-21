@@ -10,10 +10,10 @@ from modules.colorgrabber import ColorGrabber
 from modules.utils import config, save_config
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount('/static', StaticFiles(directory='static'), name='static')
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get('/', response_class=HTMLResponse)
 def root():
     color_grabber = ColorGrabber()
     if color_grabber.running:
@@ -22,7 +22,7 @@ def root():
     return 'not running'
 
 
-@app.get("/stream")
+@app.get('/stream')
 async def stream():
     color_grabber = ColorGrabber()
     return StreamingResponse(
@@ -30,20 +30,44 @@ async def stream():
     )
 
 
-@app.get("/start")
+@app.get('/start')
 def start():
     color_grabber = ColorGrabber()
-    return {"running": color_grabber.running}
+    return {'running': color_grabber.running}
 
 
-@app.get("/stop")
+@app.get('/stop')
 def stop():
     ColorGrabber().stop()
     sleep(0.5)
-    return {"running": ColorGrabber.running}
+    return {'running': ColorGrabber.running}
 
 
-@app.get("/window")
+@app.get('/brightness/{brightness}')
+def brightness(brightness: float):
+    import cv2
+
+    ColorGrabber().vid.set(cv2.CAP_PROP_BRIGHTNESS, brightness)
+    brightness = ColorGrabber().vid.get(cv2.CAP_PROP_BRIGHTNESS)
+    print('\nBrightness: ', brightness)
+    config.brightness = brightness
+    save_config()
+    return RedirectResponse('/')
+
+
+@app.get('/saturation/{sat}')
+def saturation(sat: float):
+    import cv2
+
+    ColorGrabber().vid.set(cv2.CAP_PROP_SATURATION, sat)
+    sat = ColorGrabber().vid.get(cv2.CAP_PROP_SATURATION)
+    print('\nSaturation: ', sat)
+    config.saturation = sat
+    save_config()
+    return RedirectResponse('/')
+
+
+@app.get('/window')
 def window(cmd: str):
     print(cmd)
     if cmd == 'll':
