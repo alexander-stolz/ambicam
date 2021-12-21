@@ -3,12 +3,7 @@ from types import SimpleNamespace
 from time import sleep, time
 import threading
 from numpy import arange, array, linspace
-
-
-def get_config(filename='config.json'):
-    with open(filename) as f:
-        config = json.load(f)
-    return SimpleNamespace(**config)
+from modules.utils import config
 
 
 class TelnetConnection(threading.Thread):
@@ -23,6 +18,7 @@ class TelnetConnection(threading.Thread):
         self.new_colors = None
 
     def connect(self):
+        return
         import telnetlib
 
         self.connection = telnetlib.Telnet(self.host, self.port)
@@ -30,6 +26,7 @@ class TelnetConnection(threading.Thread):
         self.start()
 
     def disconnect(self):
+        self.running = False
         self.connection.write(b'unlock\n')
         self.connection.write(b'exit\n')
         self.connection.close()
@@ -76,6 +73,9 @@ class TelnetConnection(threading.Thread):
 
     @colors.setter
     def colors(self, colors):
+        """
+        colors: list of RGB colors
+        """
         self.dt = 0.1 * (time() - self.last_time) + 0.9 * self.dt
         self.last_time = time()
         self.new_colors = colors
@@ -83,6 +83,3 @@ class TelnetConnection(threading.Thread):
 
     def stop(self):
         self.running = False
-
-
-config = get_config()

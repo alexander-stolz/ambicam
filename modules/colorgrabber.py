@@ -1,11 +1,9 @@
 import cv2
 from time import sleep
 from numpy import arange, array, linspace
-from modules.utils import get_config
-from modules.telnet import TelnetConnection
 import threading
-
-config = get_config()
+from modules.telnet import TelnetConnection
+from modules.utils import config
 
 
 class ColorGrabber(threading.Thread):
@@ -60,10 +58,17 @@ class ColorGrabber(threading.Thread):
     def save_frame(self, filepath):
         cv2.imwrite(filepath, self.frame)
 
-    def get_colors(self, frame, show=True):
+    def stream(self):
+        while self.running:
+            ret, buffer = cv2.imencode('.jpg', self.frame)
+            frame = buffer.tobytes()
+            yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
+            sleep(0.05)
+
+    def get_colors(self, frame, show=False):
         colors = []
         for y in linspace(
-            config.window['y1'], config.window['y0'], config.ligths['left']
+            config.window['y1'], config.window['y0'], config.lights['left']
         ):
             colors.append(frame[int(y), int(config.window['x0'])])
             if show:
@@ -75,7 +80,7 @@ class ColorGrabber(threading.Thread):
                     10,
                 )
         for x in linspace(
-            config.window['x0'], config.window['x1'], config.ligths['top']
+            config.window['x0'], config.window['x1'], config.lights['top']
         ):
             colors.append(frame[int(config.window['y0']), int(x)])
             if show:
@@ -87,7 +92,7 @@ class ColorGrabber(threading.Thread):
                     10,
                 )
         for y in linspace(
-            config.window['y0'], config.window['y1'], config.ligths['right']
+            config.window['y0'], config.window['y1'], config.lights['right']
         ):
             colors.append(frame[int(y), int(config.window['x1'])])
             if show:
@@ -99,7 +104,7 @@ class ColorGrabber(threading.Thread):
                     10,
                 )
         for x in linspace(
-            config.window['x1'], config.window['x0'], config.ligths['bottom']
+            config.window['x1'], config.window['x0'], config.lights['bottom']
         ):
             colors.append(frame[int(config.window['y1']), int(x)])
             if show:
@@ -117,16 +122,20 @@ class ColorGrabber(threading.Thread):
         self.running = True
         try:
             while self.running:
-                _, frame = self.vid.read()
-                frame_blured = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
-                colors = self.get_colors(frame_blured)
+                success, frame = self.vid.read()
+                if not success:
+                    sleep(0.5)
+                if config.blur:
+                    frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
+                colors = self.get_colors(frame)
+                colors = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 self.tn.colors = colors
                 sleep(config.fps.get('capture_dt'))
         finally:
             self.running = False
             self.vid.release()
             cv2.destroyAllWindows()
-            self.tn.disconnect()
+            self.tn.stop()
             ColorGrabber._instance = None
             self._frame = None
 
