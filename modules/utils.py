@@ -38,7 +38,8 @@ def get_config(filename='config.json'):
     return AttrDict(**config)
 
 
-def save_config(filename='config.json'):
+def save_config(data=None, filename='config.json'):
+    data = data or config
     with open(filename, 'w') as f:
         json.dump(config, f, indent=4)
 

@@ -1,5 +1,6 @@
-# https://fastapi.tiangolo.com/advanced/custom-response/?h=stream#streamingresponse
-# https://www.reddit.com/r/FastAPI/comments/lqximx/is_fastapi_capable_of_live_streaming_video/
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from starlette.responses import RedirectResponse, Response, StreamingResponse
 import uvicorn
 from time import sleep
@@ -36,11 +37,29 @@ def start():
     return {'running': color_grabber.running}
 
 
+@app.get('/start/force')
+def force_start():
+    ColorGrabber._instance = None
+    color_grabber = ColorGrabber()
+    return {'running': color_grabber.running}
+
+
 @app.get('/stop')
 def stop():
     ColorGrabber().stop()
     sleep(0.5)
     return {'running': ColorGrabber.running}
+
+
+@app.get('/config')
+def get_config():
+    return config
+
+
+@app.post('/config')
+def post_config(data):
+    save_config(data=data)
+    return {'status': 'ok'}
 
 
 @app.get('/brightness/{brightness}')

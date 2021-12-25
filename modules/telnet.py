@@ -70,7 +70,7 @@ class TelnetConnection(threading.Thread):
 
     @property
     def colors(self):
-        return
+        return self.new_colors
 
     @colors.setter
     def colors(self, colors):

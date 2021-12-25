@@ -18,7 +18,7 @@
     "blur": 101,
     "telnet": {
         "host": false,
-        "port": "3636"
+        "port": 3636
     },
     "connection": {
         "host": "0.0.0.0",
