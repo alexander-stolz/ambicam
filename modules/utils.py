@@ -7,7 +7,10 @@ class AttrDict(dict):
         self.update(*args, **kwargs)
 
     def __getattr__(self, attr):
-        return self.get(attr)
+        attr = self.get(attr)
+        if isinstance(attr, dict):
+            return AttrDict(attr)
+        return attr
 
     def __setattr__(self, key, value):
         self.__setitem__(key, value)

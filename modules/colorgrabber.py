@@ -37,6 +37,7 @@ class ColorGrabber(threading.Thread):
         self.vid = cv2.VideoCapture(0)
         self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, config.resolution['width'])
         self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, config.resolution['height'])
+        self.vid.set(cv2.CAP_PROP_FPS, config.fps.get('capture', 30))
 
     @property
     def brightness(self):
@@ -79,9 +80,9 @@ class ColorGrabber(threading.Thread):
             ret, buffer = cv2.imencode('.jpg', self.frame)
             frame = buffer.tobytes()
             yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
-            sleep(0.05)
+            sleep(0.3)
 
-    def get_colors(self, frame, show=False):
+    def get_colors(self, frame):
         colors = []
 
         for x in linspace(
@@ -90,53 +91,21 @@ class ColorGrabber(threading.Thread):
             int(config.lights['bottom'] / 2),
         ):
             colors.append(frame[int(config.window['y1']), int(x)])
-            if show:
-                frame = cv2.rectangle(
-                    frame,
-                    (int(x) - 5, config.window['y1'] - 5),
-                    (int(x) + 5, config.window['y1'] + 5),
-                    colors[-1].tolist(),
-                    10,
-                )
 
         for y in linspace(
             config.window['y1'], config.window['y0'], config.lights['right']
         ):
             colors.append(frame[int(y), int(config.window['x1'])])
-            if show:
-                frame = cv2.rectangle(
-                    frame,
-                    (config.window['x1'] - 5, int(y) - 5),
-                    (config.window['x1'] + 5, int(y + 5)),
-                    colors[-1].tolist(),
-                    10,
-                )
 
         for x in linspace(
             config.window['x1'], config.window['x0'], config.lights['top']
         ):
             colors.append(frame[int(config.window['y0']), int(x)])
-            if show:
-                frame = cv2.rectangle(
-                    frame,
-                    (int(x) - 5, config.window['y0'] - 5),
-                    (int(x) + 5, config.window['y0'] + 5),
-                    colors[-1].tolist(),
-                    10,
-                )
 
         for y in linspace(
             config.window['y0'], config.window['y1'], config.lights['left']
         ):
             colors.append(frame[int(y), int(config.window['x0'])])
-            if show:
-                frame = cv2.rectangle(
-                    frame,
-                    (config.window['x0'] - 5, int(y) - 5),
-                    (config.window['x0'] + 5, int(y + 5)),
-                    colors[-1].tolist(),
-                    10,
-                )
 
         for x in linspace(
             config.window['x0'],
@@ -144,14 +113,6 @@ class ColorGrabber(threading.Thread):
             int(config.lights['bottom'] / 2),
         ):
             colors.append(frame[int(config.window['y1']), int(x)])
-            if show:
-                frame = cv2.rectangle(
-                    frame,
-                    (int(x) - 5, config.window['y1'] - 5),
-                    (int(x) + 5, config.window['y1'] + 5),
-                    colors[-1].tolist(),
-                    10,
-                )
 
         self.frame = frame
         return colors
@@ -162,13 +123,17 @@ class ColorGrabber(threading.Thread):
             while self.running:
                 success, frame = self.vid.read()
                 if not success:
-                    sleep(0.5)
+                    sleep(0.1)
+                    continue
                 if config.blur:
                     frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
+                if config.smoothing and (self._frame is not None):
+                    frame = (
+                        config.smoothing * self._frame + (1 - config.smoothing) * frame
+                    )
                 colors = self.get_colors(frame)
                 # color format: BGR
                 self.tn.colors = colors
-                sleep(config.fps.get('capture_dt'))
         finally:
             self.running = False
             self.vid.release()

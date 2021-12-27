@@ -4,10 +4,10 @@
         "height": 480
     },
     "window": {
-        "x0": 240,
-        "y0": 100,
-        "x1": 470,
-        "y1": 220
+        "x0": 150,
+        "y0": 170,
+        "x1": 390,
+        "y1": 270
     },
     "lights": {
         "top": 96,
@@ -15,7 +15,7 @@
         "bottom": 96,
         "right": 54
     },
-    "blur": 101,
+    "blur": 0,
     "telnet": {
         "host": "192.168.1.108",
         "port": 3636
@@ -25,8 +25,10 @@
         "port": 5000
     },
     "fps": {
-        "capture_dt": 0.0,
-        "smoothing": 4
+        "capture": 30,
+        "interpolation": 0
     },
-    "brightness": 100.0
+    "smoothing": 0.5,
+    "brightness": 63.0,
+    "saturation": 32.0
 }

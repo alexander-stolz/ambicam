@@ -1,6 +1,6 @@
 import json
 from types import SimpleNamespace
-from time import sleep, time
+from time import sleep, perf_counter as time
 import threading
 from numpy import arange, array, linspace
 from modules.utils import config
@@ -34,7 +34,7 @@ class TelnetConnection(threading.Thread):
 
     def send(self, command):
         self.connection.write(command.encode('ascii') + b'\n')
-        return self.connection.read_until(b'\n').decode('ascii').strip()
+        # return self.connection.read_until(b'\n').decode('ascii').strip()
 
     def send_colors(self, colors):
         cmd = (
@@ -45,27 +45,45 @@ class TelnetConnection(threading.Thread):
             )
             + ';'
         )
-        _ = self.send(cmd)
+        t = time()
+        self.send(cmd)
+        return time() - t
 
     def run(self):
         self.running = True
         last_colors = None
         new_colors = None
+        smoothing = int(config.fps.get('interpolation'))
         while self.running:
             if not self.new_colors:
                 continue
+            if not smoothing:
+                self.send_colors(self.new_colors)
+                self.new_colors = None
+                continue
+            _t = time()
             last_colors = new_colors or self.new_colors
             new_colors = self.new_colors
             self.new_colors = None
-            color_steep = (array(new_colors, float) - array(last_colors, float)) / (
+            colors_slope = (array(new_colors, float) - array(last_colors, float)) / (
                 self.dt or 0.1
             )
-            for t in linspace(0, self.dt, config.fps.get('smoothing')):
+            dt_1 = time() - _t
+            for t in linspace(
+                self.dt / smoothing,
+                self.dt,
+                smoothing,
+            ):
                 if self.new_colors:
+                    print('zu früh: ', t)
                     break
-                _colors = last_colors + color_steep * t
-                self.send_colors(_colors)
-                sleep(self.dt / config.fps.get('smoothing'))
+                _colors = last_colors + colors_slope * t
+                dt_2 = self.send_colors(_colors)
+                _sleep = (self.dt - dt_1) / (smoothing + 1) - dt_2
+                if _sleep > 0:
+                    sleep(_sleep)
+                else:
+                    print('too much smoothing')
         self.disconnect()
 
     @property
