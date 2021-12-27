@@ -8,8 +8,9 @@ from modules.utils import config
 
 class ColorGrabber(threading.Thread):
     _frame = None
-    running = False
     _instance = None
+    _indices = None
+    running = False
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -82,38 +83,50 @@ class ColorGrabber(threading.Thread):
             yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
             sleep(0.3)
 
-    def get_colors(self, frame):
-        colors = []
+    @property
+    def indices(self):
+        if self._indices is not None:
+            return self._indices
 
+        indices = []
         for x in linspace(
             (config.window['x0'] + config.window['x1']) / 2,
             config.window['x1'],
             int(config.lights['bottom'] / 2),
         ):
-            colors.append(frame[int(config.window['y1']), int(x)])
+            indices.append([int(config.window['y1']), int(x)])
 
         for y in linspace(
             config.window['y1'], config.window['y0'], config.lights['right']
         ):
-            colors.append(frame[int(y), int(config.window['x1'])])
+            indices.append([int(y), int(config.window['x1'])])
 
         for x in linspace(
             config.window['x1'], config.window['x0'], config.lights['top']
         ):
-            colors.append(frame[int(config.window['y0']), int(x)])
+            indices.append([int(config.window['y0']), int(x)])
 
         for y in linspace(
             config.window['y0'], config.window['y1'], config.lights['left']
         ):
-            colors.append(frame[int(y), int(config.window['x0'])])
+            indices.append([int(y), int(config.window['x0'])])
 
         for x in linspace(
             config.window['x0'],
             (config.window['x0'] + config.window['x1']) / 2,
             int(config.lights['bottom'] / 2),
         ):
-            colors.append(frame[int(config.window['y1']), int(x)])
+            indices.append([int(config.window['y1']), int(x)])
 
+        self._indices = indices
+        return self._indices
+
+    @indices.setter
+    def indices(self, indices):
+        self._indices = indices
+
+    def get_colors(self, frame):
+        colors = [frame[y][x] for y, x in self.indices]
         self.frame = frame
         return colors
 
@@ -141,6 +154,7 @@ class ColorGrabber(threading.Thread):
             self.tn.stop()
             ColorGrabber._instance = None
             self._frame = None
+            self._indices = None
 
     def stop(self):
         self.running = False

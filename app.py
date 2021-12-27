@@ -140,22 +140,23 @@ def dt():
 def window(cmd: str):
     print(cmd)
     if cmd == 'll':
-        config.window['x0'] -= 10
+        config.window['x0'] -= 5
     if cmd == 'lr':
-        config.window['x0'] += 10
+        config.window['x0'] += 5
     if cmd == 'rl':
-        config.window['x1'] -= 10
+        config.window['x1'] -= 5
     if cmd == 'rr':
-        config.window['x1'] += 10
+        config.window['x1'] += 5
     if cmd == 'oo':
-        config.window['y0'] -= 10
+        config.window['y0'] -= 5
     if cmd == 'ou':
-        config.window['y0'] += 10
+        config.window['y0'] += 5
     if cmd == 'uo':
-        config.window['y1'] -= 10
+        config.window['y1'] -= 5
     if cmd == 'uu':
-        config.window['y1'] += 10
+        config.window['y1'] += 5
     save_config()
+    ColorGrabber().indices = None
     return RedirectResponse('/')
 
 
