@@ -10,14 +10,14 @@
         "y1": 220
     },
     "lights": {
-        "top": 0,
-        "left": 0,
-        "bottom": 25,
-        "right": 0
+        "top": 96,
+        "left": 54,
+        "bottom": 96,
+        "right": 54
     },
     "blur": 101,
     "telnet": {
-        "host": false,
+        "host": "192.168.1.108",
         "port": 3636
     },
     "connection": {

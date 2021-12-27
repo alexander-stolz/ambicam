@@ -83,44 +83,11 @@ class ColorGrabber(threading.Thread):
 
     def get_colors(self, frame, show=False):
         colors = []
-        for y in linspace(
-            config.window['y1'], config.window['y0'], config.lights['left']
-        ):
-            colors.append(frame[int(y), int(config.window['x0'])])
-            if show:
-                frame = cv2.rectangle(
-                    frame,
-                    (config.window['x0'] - 5, int(y) - 5),
-                    (config.window['x0'] + 5, int(y + 5)),
-                    colors[-1].tolist(),
-                    10,
-                )
+
         for x in linspace(
-            config.window['x0'], config.window['x1'], config.lights['top']
-        ):
-            colors.append(frame[int(config.window['y0']), int(x)])
-            if show:
-                frame = cv2.rectangle(
-                    frame,
-                    (int(x) - 5, config.window['y0'] - 5),
-                    (int(x) + 5, config.window['y0'] + 5),
-                    colors[-1].tolist(),
-                    10,
-                )
-        for y in linspace(
-            config.window['y0'], config.window['y1'], config.lights['right']
-        ):
-            colors.append(frame[int(y), int(config.window['x1'])])
-            if show:
-                frame = cv2.rectangle(
-                    frame,
-                    (config.window['x1'] - 5, int(y) - 5),
-                    (config.window['x1'] + 5, int(y + 5)),
-                    colors[-1].tolist(),
-                    10,
-                )
-        for x in linspace(
-            config.window['x1'], config.window['x0'], config.lights['bottom']
+            (config.window['x0'] + config.window['x1']) / 2,
+            config.window['x1'],
+            int(config.lights['bottom'] / 2),
         ):
             colors.append(frame[int(config.window['y1']), int(x)])
             if show:
@@ -131,6 +98,61 @@ class ColorGrabber(threading.Thread):
                     colors[-1].tolist(),
                     10,
                 )
+
+        for y in linspace(
+            config.window['y1'], config.window['y0'], config.lights['right']
+        ):
+            colors.append(frame[int(y), int(config.window['x1'])])
+            if show:
+                frame = cv2.rectangle(
+                    frame,
+                    (config.window['x1'] - 5, int(y) - 5),
+                    (config.window['x1'] + 5, int(y + 5)),
+                    colors[-1].tolist(),
+                    10,
+                )
+
+        for x in linspace(
+            config.window['x1'], config.window['x0'], config.lights['top']
+        ):
+            colors.append(frame[int(config.window['y0']), int(x)])
+            if show:
+                frame = cv2.rectangle(
+                    frame,
+                    (int(x) - 5, config.window['y0'] - 5),
+                    (int(x) + 5, config.window['y0'] + 5),
+                    colors[-1].tolist(),
+                    10,
+                )
+
+        for y in linspace(
+            config.window['y0'], config.window['y1'], config.lights['left']
+        ):
+            colors.append(frame[int(y), int(config.window['x0'])])
+            if show:
+                frame = cv2.rectangle(
+                    frame,
+                    (config.window['x0'] - 5, int(y) - 5),
+                    (config.window['x0'] + 5, int(y + 5)),
+                    colors[-1].tolist(),
+                    10,
+                )
+
+        for x in linspace(
+            config.window['x0'],
+            (config.window['x0'] + config.window['x1']) / 2,
+            int(config.lights['bottom'] / 2),
+        ):
+            colors.append(frame[int(config.window['y1']), int(x)])
+            if show:
+                frame = cv2.rectangle(
+                    frame,
+                    (int(x) - 5, config.window['y1'] - 5),
+                    (int(x) + 5, config.window['y1'] + 5),
+                    colors[-1].tolist(),
+                    10,
+                )
+
         self.frame = frame
         return colors
 
