@@ -8,8 +8,8 @@ class AttrDict(dict):
 
     def __getattr__(self, attr):
         attr = self.get(attr)
-        if isinstance(attr, dict):
-            return AttrDict(attr)
+        # if isinstance(attr, dict):
+        #     return AttrDict(attr)
         return attr
 
     def __setattr__(self, key, value):
