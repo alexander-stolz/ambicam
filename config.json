@@ -28,6 +28,11 @@
         "capture": 30,
         "interpolation": 0
     },
+    "colors": {
+        "red": 0.7,
+        "green": 1.0,
+        "blue": 0.5
+    },
     "smoothing": 0.5,
     "brightness": 63.0,
     "saturation": 32.0

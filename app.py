@@ -1,26 +1,54 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from starlette.responses import RedirectResponse, Response, StreamingResponse
 import uvicorn
 from time import sleep
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Form, Request, status
+from fastapi.responses import (
+    HTMLResponse,
+    RedirectResponse,
+    StreamingResponse,
+)
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from modules.colorgrabber import ColorGrabber
 from modules.utils import config, save_config
 
 app = FastAPI()
 app.mount('/static', StaticFiles(directory='static'), name='static')
+templates = Jinja2Templates(directory="templates")
 
 
 @app.get('/', response_class=HTMLResponse)
-def root():
+def root(request: Request):
     color_grabber = ColorGrabber()
     if color_grabber.running:
         color_grabber.save_frame('static/frame.jpg')
-        return open('templates/index.html').read()
+        # return render_template('index.html', config=config)
+        return templates.TemplateResponse(
+            'index.html',
+            {
+                'request': request,
+                'config': config,
+            },
+        )
     return 'not running'
+
+
+@app.post('/colors')
+def colors(
+    request: Request,
+    red: float = Form(...),
+    green: float = Form(...),
+    blue: float = Form(...),
+):
+    config.colors = {
+        'red': red / 100,
+        'green': green / 100,
+        'blue': blue / 100,
+    }
+    save_config()
+    return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get('/stream')

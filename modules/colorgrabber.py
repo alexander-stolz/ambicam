@@ -1,6 +1,6 @@
 import cv2
 from time import sleep
-from numpy import arange, array, linspace
+from numpy import arange, array, linspace, ndarray
 import threading
 from modules.telnet import TelnetConnection
 from modules.utils import config
@@ -135,9 +135,16 @@ class ColorGrabber(threading.Thread):
         try:
             while self.running:
                 success, frame = self.vid.read()
+                frame = ndarray.astype(frame, dtype=float)
                 if not success:
                     sleep(0.1)
                     continue
+                if config.colors is not None:
+                    weights = array(
+                        [config.colors.get(c, 1) for c in ['blue', 'green', 'red']],
+                        dtype=float,
+                    )
+                    frame *= weights
                 if config.blur:
                     frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
                 if config.smoothing and (self._frame is not None):

@@ -1,11 +1,70 @@
 <!DOCTYPE html>
 <html>
 
-<body>
+<head>
+    <title>ambicam control</title>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous"> -->
+    <style>
+        .input {
+            width: 50vw;
+            padding: 10px;
+            box-sizing: border-box;
+            /* border: 2px solid #6969b8; */
+            border: 2px solid #e96464;
+            border-radius: 4px;
+            font-size: large;
+            text-align: center;
+        }
 
-    <head>
-        <title>ambicam control</title>
-    </head>
+        .button-big {
+            margin: 5px;
+            width: 60px;
+            height: 60px;
+            box-sizing: border-box;
+            /* border: 2px solid red; */
+            /* border-radius: 4px; */
+            font-size: large;
+            text-align: center;
+            color: white;
+            background-color: #e96464;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .button-medium {
+            margin: 5px;
+            width: 100px;
+            height: 40px;
+            box-sizing: border-box;
+            /* border: 2px solid red; */
+            /* border-radius: 4px; */
+            font-size: large;
+            text-align: center;
+            color: white;
+            background-color: #67a4d6;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .button-small {
+            margin: 1px;
+            width: 25px;
+            height: 25px;
+            box-sizing: border-box;
+            /* border: 2px solid red; */
+            /* border-radius: 4px; */
+            font-size: medium;
+            text-align: center;
+            color: white;
+            background-color: #67a4d6;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
     <p>
         <!-- 3x3 table -->
     <table align="center">
@@ -13,32 +72,32 @@
             <td>
             </td>
             <td align="center">
-                <button onclick="window.location.href='/window?cmd=ou'">&#11015;</button>
-                <button onclick="window.location.href='/window?cmd=oo'">&#11014;</button>
+                <button class="button-big" onclick="window.location.href='/window?cmd=ou'">&#11015;</button>
+                <button class="button-big" onclick="window.location.href='/window?cmd=oo'">&#11014;</button>
             </td>
             <td>
             </td>
         </tr>
         <tr>
             <td>
-                <button onclick="window.location.href='/window?cmd=ll'">&#11013;</button><br>
-                <button onclick="window.location.href='/window?cmd=lr'">&#10145;</button>
+                <button class="button-big" onclick="window.location.href='/window?cmd=ll'">&#11013;</button><br>
+                <button class="button-big" onclick="window.location.href='/window?cmd=lr'">&#10145;</button>
             </td>
             <td>
                 <img src="../static/frame.jpg">
                 <!-- <img src="/stream"> -->
             </td>
             <td>
-                <button onclick="window.location.href='/window?cmd=rl'">&#11013;</button><br>
-                <button onclick="window.location.href='/window?cmd=rr'">&#10145;</button>
+                <button class="button-big" onclick="window.location.href='/window?cmd=rl'">&#11013;</button><br>
+                <button class="button-big" onclick="window.location.href='/window?cmd=rr'">&#10145;</button>
             </td>
         </tr>
         <tr>
             <td>
             </td>
             <td align="center">
-                <button onclick="window.location.href='/window?cmd=uu'">&#11015;</button>
-                <button onclick="window.location.href='/window?cmd=uo'">&#11014;</button>
+                <button class="button-big" onclick="window.location.href='/window?cmd=uu'">&#11015;</button>
+                <button class="button-big" onclick="window.location.href='/window?cmd=uo'">&#11014;</button>
             </td>
             <td>
             </td>
@@ -48,31 +107,66 @@
 
     <div style="height:20px"></div>
 
+    <div align="center">
+        <button class="button-medium" onclick="window.location.href='/'">reload</button>
+        <button class=" button-medium" onclick="window.location.href='/stream'">stream</button>
+        <button class="button-medium" onclick="window.location.href='/stop'">stop</button>
+    </div>
+
     <p>
     <div align="center">
+        <br>
         <table>
             <tr>
                 <td>Brightness:</td>
-                <td><button style="width: 25px" onclick="window.location.href='/brightness_down'">-</button></td>
-                <td><button style="width: 25px" onclick="window.location.href='/brightness_up'">+</button></td>
+                <td><button class="button-small" style="width: 25px"
+                        onclick="window.location.href='/brightness_down'">-</button></td>
+                <td><button class="button-small" style="width: 25px"
+                        onclick="window.location.href='/brightness_up'">+</button></td>
             </tr>
             <tr>
                 <td>Saturation:</td>
-                <td><button style="width: 25px" onclick="window.location.href='/saturation_down'">-</button></td>
-                <td><button style="width: 25px" onclick="window.location.href='/saturation_up'">+</button></td>
+                <td><button class="button-small" style="width: 25px"
+                        onclick="window.location.href='/saturation_down'">-</button></td>
+                <td><button class="button-small" style="width: 25px"
+                        onclick="window.location.href='/saturation_up'">+</button></td>
             </tr>
             <tr>
                 <td>Smoothing:</td>
-                <td><button style="width: 25px" onclick="window.location.href='/smoothing_down'">-</button></td>
-                <td><button style="width: 25px" onclick="window.location.href='/smoothing_up'">+</button></td>
+                <td><button class="button-small" style="width: 25px"
+                        onclick="window.location.href='/smoothing_down'">-</button></td>
+                <td><button class="button-small" style="width: 25px"
+                        onclick="window.location.href='/smoothing_up'">+</button></td>
             </tr>
         </table>
         <br>
-        <div>
-            <button onclick="window.location.href='/'">reload</button>
-            <button onclick="window.location.href='/stream'">stream</button>
-            <button onclick="window.location.href='/stop'">stop</button>
-        </div>
+    </div>
+    </p>
+
+
+    <p>
+    <div align="center">
+        <form method="post" action="/colors">
+            <table>
+                <tr>
+                    <td>R</td>
+                    <td><input type="range" name="red" min="0" max="100" value="{{ config.colors.get('red', 1) * 100}}">
+                    </td>
+                </tr>
+                <tr>
+                    <td>G</td>
+                    <td><input type="range" name="green" min="0" max="100"
+                            value="{{ config.colors.get('green', 1) * 100}}">
+                    </td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td><input type="range" name="blue" min="0" max="100"
+                            value="{{ config.colors.get('blue', 1) * 100}}"></td>
+                </tr>
+            </table>
+            <button class="button-medium" type="submit">save</button>
+        </form>
     </div>
     </p>
 </body>

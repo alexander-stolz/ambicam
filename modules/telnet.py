@@ -55,7 +55,8 @@ class TelnetConnection(threading.Thread):
         new_colors = None
         smoothing = int(config.fps.get('interpolation'))
         while self.running:
-            if not self.new_colors:
+            if self.new_colors is None:
+                sleep(0.01)
                 continue
             if not smoothing:
                 self.send_colors(self.new_colors)
@@ -97,7 +98,7 @@ class TelnetConnection(threading.Thread):
         """
         self.dt = 0.1 * (time() - self.last_time) + 0.9 * self.dt
         self.last_time = time()
-        self.new_colors = colors
+        self.new_colors = colors[:]
         # print('\r', self.dt, end='')
 
     def stop(self):

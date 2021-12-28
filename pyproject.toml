@@ -11,6 +11,7 @@ opencv-contrib-python = "^4.5.4"
 uvicorn = "^0.16.0"
 fastapi = "^0.70.1"
 Jinja2 = "^3.0.3"
+python-multipart = "^0.0.5"
 
 [tool.poetry.dev-dependencies]
 
