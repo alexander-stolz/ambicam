@@ -10,6 +10,7 @@ class ColorGrabber(threading.Thread):
     _frame = None
     _instance = None
     _indices = None
+    _last_colors = None
     running = False
 
     def __new__(cls, *args, **kwargs):
@@ -126,7 +127,14 @@ class ColorGrabber(threading.Thread):
         self._indices = indices
 
     def get_colors(self, frame):
-        colors = [frame[y][x] for y, x in self.indices]
+        colors = array([frame[y][x] for y, x in self.indices])
+        if config.colors is not None:
+            colors *= [config.colors.get(c, 1) for c in ['blue', 'green', 'red']]
+        if config.smoothing and (self._last_colors is not None):
+            colors = (
+                config.smoothing * self._last_colors + (1 - config.smoothing) * colors
+            )
+        self._last_colors = colors
         self.frame = frame
         return colors
 
@@ -139,18 +147,8 @@ class ColorGrabber(threading.Thread):
                 if not success:
                     sleep(0.1)
                     continue
-                if config.colors is not None:
-                    weights = array(
-                        [config.colors.get(c, 1) for c in ['blue', 'green', 'red']],
-                        dtype=float,
-                    )
-                    frame *= weights
                 if config.blur:
                     frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
-                if config.smoothing and (self._frame is not None):
-                    frame = (
-                        config.smoothing * self._frame + (1 - config.smoothing) * frame
-                    )
                 colors = self.get_colors(frame)
                 # color format: BGR
                 self.tn.colors = colors

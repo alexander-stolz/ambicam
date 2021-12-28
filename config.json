@@ -29,9 +29,9 @@
         "interpolation": 0
     },
     "colors": {
-        "red": 0.7,
-        "green": 1.0,
-        "blue": 0.5
+        "red": 0.56,
+        "green": 0.55,
+        "blue": 0.46
     },
     "smoothing": 0.5,
     "brightness": 63.0,
