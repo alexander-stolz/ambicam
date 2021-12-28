@@ -164,9 +164,15 @@
                     <td><input type="range" name="blue" min="0" max="100"
                             value="{{ config.colors.get('blue', 1) * 100}}"></td>
                 </tr>
+                <tr>
+                    <td>L</td>
+                    <td><input type="range" name="brightness" min="0" max="100"
+                            value="{{ config.colors.get('brightness', 1) * 100}}"></td>
+                </tr>
             </table>
             <button class="button-medium" type="submit">save</button>
         </form>
+
     </div>
     </p>
 </body>

@@ -129,7 +129,9 @@ class ColorGrabber(threading.Thread):
     def get_colors(self, frame):
         colors = array([frame[y][x] for y, x in self.indices])
         if config.colors is not None:
-            colors *= [config.colors.get(c, 1) for c in ['blue', 'green', 'red']]
+            weights = array([config.colors.get(c, 1) for c in ['blue', 'green', 'red']])
+            weights = weights / weights.max() * config.colors.get('brightness', 1)
+            colors *= weights
         if config.smoothing and (self._last_colors is not None):
             colors = (
                 config.smoothing * self._last_colors + (1 - config.smoothing) * colors

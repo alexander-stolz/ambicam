@@ -31,7 +31,8 @@
     "colors": {
         "red": 0.56,
         "green": 0.55,
-        "blue": 0.46
+        "blue": 0.46,
+        "brightness": 1.0
     },
     "smoothing": 0.5,
     "brightness": 63.0,

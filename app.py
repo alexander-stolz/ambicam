@@ -41,11 +41,13 @@ def colors(
     red: float = Form(...),
     green: float = Form(...),
     blue: float = Form(...),
+    brightness: float = Form(...),
 ):
     config.colors = {
         'red': red / 100,
         'green': green / 100,
         'blue': blue / 100,
+        'brightness': brightness / 100,
     }
     save_config()
     return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
