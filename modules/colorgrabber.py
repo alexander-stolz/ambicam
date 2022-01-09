@@ -4,7 +4,7 @@ from numpy import arange, array, linspace, ndarray, average
 import threading
 from modules.telnet import TelnetConnection
 from modules.utils import config
-from camera import Cv2Camera as Camera
+from modules.camera import Cv2Camera as Camera
 
 
 class ColorGrabber(threading.Thread):

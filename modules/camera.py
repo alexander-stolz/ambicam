@@ -2,7 +2,10 @@ from abc import ABC, abstractmethod
 from numpy import ndarray
 from time import sleep
 import cv2
-from utils import config
+from io import BytesIO
+import numpy as np
+from modules.utils import config
+
 
 class AbstractCamera(ABC):
     @abstractmethod
@@ -20,13 +23,31 @@ class AbstractCamera(ABC):
 
 class PiCamera(AbstractCamera):
     def connect(self):
-        pass
+        # should be installed by default on raspberry
+        try:
+            import picamera
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError(
+                'picamera not installed. '
+                'try: sudo apt install python-picamera python3-picamera'
+            )
+        self.vid = picamera.PiCamera()
+        self.vid.resolution = (config.resolution['width'], config.resolution['height'])
+        self.vid.framerate = config.fps.get('capture', 30)
+        self.vid.start_preview()
+        sleep(2)
+        g = self.vid.awb_gains
+        self.vid.awb_mode = 'off'
+        self.vid.awb_gains = g
 
     def disconnect(self):
-        pass
+        self.vid.close()
 
     def get_frame(self):
-        pass
+        with picamera.array.PiRGBArray(self.vid) as stream:
+            self.vid.capture(stream, format='bgr')
+            frame = stream.array
+        return ndarray.astype(frame, dtype=float)
 
 
 class Cv2Camera(AbstractCamera):

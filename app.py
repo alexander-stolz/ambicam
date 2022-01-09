@@ -92,54 +92,6 @@ def post_config(data):
     return {'status': 'ok'}
 
 
-@app.get('/brightness/{val}')
-def brightness(val: float):
-    ColorGrabber().brightness = val
-    config.brightness = ColorGrabber().brightness
-    save_config()
-    return RedirectResponse('/')
-
-
-@app.get('/brightness_up')
-def brightness_up():
-    ColorGrabber().brightness += 5
-    config.brightness = ColorGrabber().brightness
-    save_config()
-    return RedirectResponse('/')
-
-
-@app.get('/brightness_down')
-def brightness_down():
-    ColorGrabber().brightness -= 5
-    config.brightness = ColorGrabber().brightness
-    save_config()
-    return RedirectResponse('/')
-
-
-@app.get('/saturation/{val}')
-def saturation(val: float):
-    ColorGrabber().saturation = val
-    config.saturation = ColorGrabber().saturation
-    save_config()
-    return RedirectResponse('/')
-
-
-@app.get('/saturation_up')
-def saturation_up():
-    ColorGrabber().saturation += 5
-    config.saturation = ColorGrabber().saturation
-    save_config()
-    return RedirectResponse('/')
-
-
-@app.get('/saturation_down')
-def saturation_down():
-    ColorGrabber().saturation -= 5
-    config.saturation = ColorGrabber().saturation
-    save_config()
-    return RedirectResponse('/')
-
-
 @app.get('/smoothing/{val}')
 def saturation(val: float):
     config.smoothing = val
