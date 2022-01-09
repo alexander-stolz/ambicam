@@ -4,41 +4,52 @@
         "height": 480
     },
     "window": {
-        "x0": 150,
-        "y0": 170,
-        "x1": 390,
-        "y1": 270
+        "left": 140,
+        "top": 205,
+        "right": 385,
+        "bottom": 300
+    },
+    "checkWindow": {
+        "top": 135,
+        "left": 125,
+        "bottom": 270,
+        "right": 420
     },
     "leds": [
         {
             "side": "bottom",
             "leds": 48,
             "from": 0.5,
-            "to": 1
+            "to": 1,
+            "check": false
         },
         {
             "side": "right",
             "leds": 54,
             "from": 1,
-            "to": 0
+            "to": 0,
+            "check": true
         },
         {
             "side": "top",
             "leds": 96,
             "from": 1,
-            "to": 0
+            "to": 0,
+            "check": true
         },
         {
             "side": "left",
             "leds": 54,
             "from": 0,
-            "to": 1
+            "to": 1,
+            "check": true
         },
         {
             "side": "bottom",
             "leds": 48,
             "from": 0,
-            "to": 0.5
+            "to": 0.5,
+            "check": false
         }
     ],
     "blur": 0,
@@ -55,12 +66,12 @@
         "interpolation": 0
     },
     "colors": {
-        "red": 0.56,
-        "green": 0.55,
-        "blue": 0.46,
-        "brightness": 1.0
+        "red": 0.44,
+        "green": 0.48,
+        "blue": 0.5,
+        "brightness": 0.69
     },
-    "smoothing": 0.5,
+    "smoothing": 0.95,
     "brightness": 63.0,
     "saturation": 32.0
 }

@@ -1,6 +1,6 @@
 import cv2
 from time import sleep
-from numpy import arange, array, linspace, ndarray
+from numpy import arange, array, linspace, ndarray, average
 import threading
 from modules.telnet import TelnetConnection
 from modules.utils import config
@@ -10,8 +10,11 @@ class ColorGrabber(threading.Thread):
     _frame = None
     _instance = None
     _indices = None
+    _check_indices = None
     _last_colors = None
     running = False
+    auto_wb = False
+    wb_correction = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -63,11 +66,19 @@ class ColorGrabber(threading.Thread):
             return
         frame = cv2.rectangle(
             self._frame,
-            (config.window['x0'], config.window['y0']),
-            (config.window['x1'], config.window['y1']),
+            (config.window['left'], config.window['top']),
+            (config.window['right'], config.window['bottom']),
             (0, 0, 255),
             2,
         )
+        if self.auto_wb:
+            frame = cv2.rectangle(
+                self._frame,
+                (config.checkWindow['left'], config.checkWindow['top']),
+                (config.checkWindow['right'], config.checkWindow['bottom']),
+                (255, 0, 0),
+                2,
+            )
         return frame
 
     @frame.setter
@@ -90,44 +101,89 @@ class ColorGrabber(threading.Thread):
             return self._indices
 
         indices = []
-        for x in linspace(
-            (config.window['x0'] + config.window['x1']) / 2,
-            config.window['x1'],
-            int(config.lights['bottom'] / 2),
-        ):
-            indices.append([int(config.window['y1']), int(x)])
+        check_indices = []
+        self.auto_wb = False
 
-        for y in linspace(
-            config.window['y1'], config.window['y0'], config.lights['right']
-        ):
-            indices.append([int(y), int(config.window['x1'])])
+        idx = -1
+        for side in config.leds:
+            if side['side'] in ('top', 'bottom'):
+                for x in linspace(
+                    (
+                        config.window['left']
+                        + side['from']
+                        * (config.window['right'] - config.window['left'])
+                    ),
+                    (
+                        config.window['left']
+                        + side['to'] * (config.window['right'] - config.window['left'])
+                    ),
+                    int(side['leds']),
+                ):
+                    idx += 1
+                    indices.append([int(config.window[side['side']]), int(x)])
+                    if side.get('check'):
+                        self.auto_wb = True
+                        check_indices.append(
+                            [idx, int(config.checkWindow[side['side']]), int(x)]
+                        )
 
-        for x in linspace(
-            config.window['x1'], config.window['x0'], config.lights['top']
-        ):
-            indices.append([int(config.window['y0']), int(x)])
-
-        for y in linspace(
-            config.window['y0'], config.window['y1'], config.lights['left']
-        ):
-            indices.append([int(y), int(config.window['x0'])])
-
-        for x in linspace(
-            config.window['x0'],
-            (config.window['x0'] + config.window['x1']) / 2,
-            int(config.lights['bottom'] / 2),
-        ):
-            indices.append([int(config.window['y1']), int(x)])
+            if side['side'] in ('left', 'right'):
+                for y in linspace(
+                    (
+                        config.window['top']
+                        + side['from']
+                        * (config.window['bottom'] - config.window['top'])
+                    ),
+                    (
+                        config.window['top']
+                        + side['to'] * (config.window['bottom'] - config.window['top'])
+                    ),
+                    int(side['leds']),
+                ):
+                    idx += 1
+                    indices.append([int(y), int(config.window[side['side']])])
+                    if side.get('check'):
+                        self.auto_wb = True
+                        check_indices.append(
+                            [idx, int(y), int(config.checkWindow[side['side']])]
+                        )
 
         self._indices = indices
+        self._check_indices = check_indices
         return self._indices
+
+    @property
+    def check_indices(self):
+        if self._check_indices is not None:
+            return self._check_indices
+
+        # re create all indices
+        self._indices = None
+        self.indices
+
+        return self._check_indices
 
     @indices.setter
     def indices(self, indices):
         self._indices = indices
 
-    def get_colors(self, frame):
+    def get_color_correction(self, frame):
+        if self._last_colors is None:
+            return array([1, 1, 1])
+        sent_colors = array([self._last_colors[i] for i, *_ in self.check_indices])
+        seen_colors = array([frame[y][x] for _, y, x in self.check_indices])
+        sent_weights = sum(sent_colors.T)
+        seen_weights = sum(seen_colors.T)
+        sent_avg = average(sent_colors, weights=sent_weights, axis=0)
+        seen_avg = average(seen_colors, weights=seen_weights, axis=0)
+        factors = sent_avg / seen_avg
+        self.wb_correction = factors / max(factors)
+        return self.wb_correction
+
+    def get_colors(self, frame, wb_factors=None):
         colors = array([frame[y][x] for y, x in self.indices])
+        if self.auto_wb:
+            colors *= self.get_color_correction(frame)
         if config.colors is not None:
             weights = array([config.colors.get(c, 1) for c in ['blue', 'green', 'red']])
             weights = weights / weights.max() * config.colors.get('brightness', 1)

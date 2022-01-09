@@ -166,27 +166,72 @@ def dt():
     return {'dt': ColorGrabber().tn.dt}
 
 
+@app.get('/wb')
+def wb():
+    return dict(
+        red=ColorGrabber().wb_correction[0],
+        green=ColorGrabber().wb_correction[1],
+        blue=ColorGrabber().wb_correction[2],
+    )
+
+
+@app.get('/wb/off')
+def wb():
+    ColorGrabber().auto_wb = False
+    return RedirectResponse('/')
+
+
+@app.get('/wb/on')
+def wb():
+    ColorGrabber().auto_wb = True
+    return RedirectResponse('/')
+
+
 @app.get('/window')
 def window(cmd: str):
     print(cmd)
     if cmd == 'll':
-        config.window['x0'] -= 5
+        config.window['left'] -= 5
     if cmd == 'lr':
-        config.window['x0'] += 5
+        config.window['left'] += 5
     if cmd == 'rl':
-        config.window['x1'] -= 5
+        config.window['right'] -= 5
     if cmd == 'rr':
-        config.window['x1'] += 5
+        config.window['right'] += 5
     if cmd == 'oo':
-        config.window['y0'] -= 5
+        config.window['top'] -= 5
     if cmd == 'ou':
-        config.window['y0'] += 5
+        config.window['top'] += 5
     if cmd == 'uo':
-        config.window['y1'] -= 5
+        config.window['bottom'] -= 5
     if cmd == 'uu':
-        config.window['y1'] += 5
+        config.window['bottom'] += 5
     save_config()
     ColorGrabber().indices = None
+    return RedirectResponse('/')
+
+
+@app.get('/checkwindow')
+def checkwindow(cmd: str):
+    print(cmd)
+    if cmd == 'll':
+        config.checkWindow['left'] -= 5
+    if cmd == 'lr':
+        config.checkWindow['left'] += 5
+    if cmd == 'rl':
+        config.checkWindow['right'] -= 5
+    if cmd == 'rr':
+        config.checkWindow['right'] += 5
+    if cmd == 'oo':
+        config.checkWindow['top'] -= 5
+    if cmd == 'ou':
+        config.checkWindow['top'] += 5
+    if cmd == 'uo':
+        config.checkWindow['bottom'] -= 5
+    if cmd == 'uu':
+        config.checkWindow['bottom'] += 5
+    save_config()
+    ColorGrabber()._check_indices = None
     return RedirectResponse('/')
 
 
