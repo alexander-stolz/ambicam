@@ -176,8 +176,9 @@ class ColorGrabber(threading.Thread):
         seen_weights = sum(seen_colors.T)
         sent_avg = average(sent_colors, weights=sent_weights, axis=0)
         seen_avg = average(seen_colors, weights=seen_weights, axis=0)
-        factors = sent_avg / seen_avg
-        self.wb_correction = factors / max(factors)
+        if any(seen_avg):
+            factors = sent_avg / seen_avg
+            self.wb_correction = factors / max(factors)
         return self.wb_correction
 
     def get_colors(self, frame, wb_factors=None):
