@@ -4,6 +4,7 @@ from numpy import arange, array, linspace, ndarray, average
 import threading
 from modules.telnet import TelnetConnection
 from modules.utils import config
+from camera import Cv2Camera as Camera
 
 
 class ColorGrabber(threading.Thread):
@@ -39,26 +40,8 @@ class ColorGrabber(threading.Thread):
 
     def connect_to_camera(self):
         print("connect camera")
-        self.vid = cv2.VideoCapture(0)
-        self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, config.resolution['width'])
-        self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, config.resolution['height'])
-        self.vid.set(cv2.CAP_PROP_FPS, config.fps.get('capture', 30))
-
-    @property
-    def brightness(self):
-        return self.vid.get(cv2.CAP_PROP_BRIGHTNESS)
-
-    @brightness.setter
-    def brightness(self, value):
-        self.vid.set(cv2.CAP_PROP_BRIGHTNESS, value)
-
-    @property
-    def saturation(self):
-        return self.vid.get(cv2.CAP_PROP_SATURATION)
-
-    @saturation.setter
-    def saturation(self, value):
-        self.vid.set(cv2.CAP_PROP_SATURATION, value)
+        self.camera = Camera()
+        self.camera.connect()
 
     @property
     def frame(self):
@@ -200,11 +183,7 @@ class ColorGrabber(threading.Thread):
         self.running = True
         try:
             while self.running:
-                success, frame = self.vid.read()
-                frame = ndarray.astype(frame, dtype=float)
-                if not success:
-                    sleep(0.1)
-                    continue
+                frame = self.camera.get_frame()
                 if config.blur:
                     frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
                 colors = self.get_colors(frame)
@@ -212,8 +191,7 @@ class ColorGrabber(threading.Thread):
                 self.tn.colors = colors
         finally:
             self.running = False
-            self.vid.release()
-            cv2.destroyAllWindows()
+            self.camera.disconnect()
             self.tn.stop()
             ColorGrabber._instance = None
             self._frame = None
