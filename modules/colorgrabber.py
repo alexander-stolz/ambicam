@@ -14,7 +14,7 @@ class ColorGrabber(threading.Thread):
     _last_colors = None
     running = False
     auto_wb = False
-    wb_correction = None
+    wb_correction = array([1, 1, 1])
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
