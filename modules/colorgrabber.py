@@ -181,9 +181,6 @@ class ColorGrabber(threading.Thread):
                 not any(self.last_wb_weights)
                 or weight / max(self.last_wb_weights) > 0.2
             ):
-                log.info(
-                    'sent: %s   seen: %s   factors: %s', sent_avg, seen_avg, factors
-                )
                 self.last_wb_weights.append(weight)
                 self.last_wb_corrections.append(factors)
                 self.wb_correction = average(
