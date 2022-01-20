@@ -21,8 +21,8 @@ class ColorGrabber(threading.Thread):
     auto_wb = False
     wb_queue_size = 30
     wb_correction = array([1, 1, 1])
-    last_wb_corrections = deque(maxlen=30)
-    last_wb_weights = deque(maxlen=30)
+    last_wb_corrections = deque(maxlen=150)
+    last_wb_weights = deque(maxlen=150)
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -32,10 +32,10 @@ class ColorGrabber(threading.Thread):
             cls._instance.connect_to_telnet()
             cls._instance.connect_to_camera()
             cls._instance.last_wb_corrections = deque(
-                maxlen=config.colors.get('queueSize', 30)
+                maxlen=config.colors.get('queueSize', 150)
             )
             cls._instance.last_wb_weights = deque(
-                maxlen=config.colors.get('queueSize', 30)
+                maxlen=config.colors.get('queueSize', 150)
             )
             cls._instance.start()
             for _ in range(10):
@@ -181,7 +181,9 @@ class ColorGrabber(threading.Thread):
                 not any(self.last_wb_weights)
                 or weight / max(self.last_wb_weights) > 0.2
             ):
-                # wb_correction = self.last_wb_correction * factors
+                log.info(
+                    'sent: %s   seen: %s   factors: %s', sent_avg, seen_avg, factors
+                )
                 self.last_wb_weights.append(weight)
                 self.last_wb_corrections.append(factors)
                 self.wb_correction = average(
