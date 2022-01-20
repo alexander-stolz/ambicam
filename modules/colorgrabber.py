@@ -1,9 +1,14 @@
+import logging
 import cv2
 from time import sleep
 from numpy import arange, array, linspace, ndarray, average
 import threading
 from modules.telnet import TelnetConnection
 from modules.utils import config
+from modules.camera import Cv2Camera as Camera
+from collections import deque
+
+log = logging.getLogger(__name__)
 
 
 class ColorGrabber(threading.Thread):
@@ -14,7 +19,10 @@ class ColorGrabber(threading.Thread):
     _last_colors = None
     running = False
     auto_wb = False
+    wb_queue_size = 30
     wb_correction = array([1, 1, 1])
+    last_wb_corrections = deque(maxlen=150)
+    last_wb_weights = deque(maxlen=150)
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -23,6 +31,12 @@ class ColorGrabber(threading.Thread):
             super().__init__(cls._instance)
             cls._instance.connect_to_telnet()
             cls._instance.connect_to_camera()
+            cls._instance.last_wb_corrections = deque(
+                maxlen=config.colors.get('queueSize', 150)
+            )
+            cls._instance.last_wb_weights = deque(
+                maxlen=config.colors.get('queueSize', 150)
+            )
             cls._instance.start()
             for _ in range(10):
                 print(_)
@@ -39,26 +53,8 @@ class ColorGrabber(threading.Thread):
 
     def connect_to_camera(self):
         print("connect camera")
-        self.vid = cv2.VideoCapture(0)
-        self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, config.resolution['width'])
-        self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, config.resolution['height'])
-        self.vid.set(cv2.CAP_PROP_FPS, config.fps.get('capture', 30))
-
-    @property
-    def brightness(self):
-        return self.vid.get(cv2.CAP_PROP_BRIGHTNESS)
-
-    @brightness.setter
-    def brightness(self, value):
-        self.vid.set(cv2.CAP_PROP_BRIGHTNESS, value)
-
-    @property
-    def saturation(self):
-        return self.vid.get(cv2.CAP_PROP_SATURATION)
-
-    @saturation.setter
-    def saturation(self, value):
-        self.vid.set(cv2.CAP_PROP_SATURATION, value)
+        self.camera = Camera()
+        self.camera.connect()
 
     @property
     def frame(self):
@@ -174,14 +170,30 @@ class ColorGrabber(threading.Thread):
         seen_colors = array([frame[y][x] for _, y, x in self.check_indices])
         sent_weights = sum(sent_colors.T)
         seen_weights = sum(seen_colors.T)
-        sent_avg = average(sent_colors, weights=sent_weights, axis=0)
-        seen_avg = average(seen_colors, weights=seen_weights, axis=0)
-        if any(seen_avg):
+        combined_weights = sent_weights * seen_weights
+        sent_avg = average(sent_colors, weights=combined_weights, axis=0)
+        seen_avg = average(seen_colors, weights=combined_weights, axis=0)
+        if all(seen_avg):
             factors = sent_avg / seen_avg
-            self.wb_correction = factors / max(factors)
+            factors /= max(factors)
+            weight = sum(combined_weights)
+            if (
+                not any(self.last_wb_weights)
+                or weight / max(self.last_wb_weights) > 0.2
+            ):
+                log.info(
+                    'sent: %s   seen: %s   factors: %s', sent_avg, seen_avg, factors
+                )
+                self.last_wb_weights.append(weight)
+                self.last_wb_corrections.append(factors)
+                self.wb_correction = average(
+                    self.last_wb_corrections,
+                    weights=self.last_wb_weights,
+                    axis=0,
+                )
         return self.wb_correction
 
-    def get_colors(self, frame, wb_factors=None):
+    def get_colors(self, frame):
         colors = array([frame[y][x] for y, x in self.indices])
         if self.auto_wb:
             colors *= self.get_color_correction(frame)
@@ -201,11 +213,7 @@ class ColorGrabber(threading.Thread):
         self.running = True
         try:
             while self.running:
-                success, frame = self.vid.read()
-                frame = ndarray.astype(frame, dtype=float)
-                if not success:
-                    sleep(0.1)
-                    continue
+                frame = self.camera.get_frame()
                 if config.blur:
                     frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
                 colors = self.get_colors(frame)
@@ -213,8 +221,7 @@ class ColorGrabber(threading.Thread):
                 self.tn.colors = colors
         finally:
             self.running = False
-            self.vid.release()
-            cv2.destroyAllWindows()
+            self.camera.disconnect()
             self.tn.stop()
             ColorGrabber._instance = None
             self._frame = None
