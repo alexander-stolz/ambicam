@@ -1,3 +1,4 @@
+import logging
 import cv2
 from time import sleep
 from numpy import arange, array, linspace, ndarray, average
@@ -5,6 +6,9 @@ import threading
 from modules.telnet import TelnetConnection
 from modules.utils import config
 from modules.camera import Cv2Camera as Camera
+from collections import deque
+
+log = logging.getLogger(__name__)
 
 
 class ColorGrabber(threading.Thread):
@@ -15,7 +19,10 @@ class ColorGrabber(threading.Thread):
     _last_colors = None
     running = False
     auto_wb = False
+    wb_queue_size = 30
     wb_correction = array([1, 1, 1])
+    last_wb_corrections = deque(maxlen=30)
+    last_wb_weights = deque(maxlen=30)
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -24,6 +31,12 @@ class ColorGrabber(threading.Thread):
             super().__init__(cls._instance)
             cls._instance.connect_to_telnet()
             cls._instance.connect_to_camera()
+            cls._instance.last_wb_corrections = deque(
+                maxlen=config.colors.get('queueSize', 30)
+            )
+            cls._instance.last_wb_weights = deque(
+                maxlen=config.colors.get('queueSize', 30)
+            )
             cls._instance.start()
             for _ in range(10):
                 print(_)
@@ -157,14 +170,28 @@ class ColorGrabber(threading.Thread):
         seen_colors = array([frame[y][x] for _, y, x in self.check_indices])
         sent_weights = sum(sent_colors.T)
         seen_weights = sum(seen_colors.T)
-        sent_avg = average(sent_colors, weights=sent_weights, axis=0)
-        seen_avg = average(seen_colors, weights=seen_weights, axis=0)
-        if any(seen_avg):
+        combined_weights = sent_weights * seen_weights
+        sent_avg = average(sent_colors, weights=combined_weights, axis=0)
+        seen_avg = average(seen_colors, weights=combined_weights, axis=0)
+        if all(seen_avg):
             factors = sent_avg / seen_avg
-            self.wb_correction = factors / max(factors)
+            factors /= max(factors)
+            weight = sum(combined_weights)
+            if (
+                not any(self.last_wb_weights)
+                or weight / max(self.last_wb_weights) > 0.2
+            ):
+                # wb_correction = self.last_wb_correction * factors
+                self.last_wb_weights.append(weight)
+                self.last_wb_corrections.append(factors)
+                self.wb_correction = average(
+                    self.last_wb_corrections,
+                    weights=self.last_wb_weights,
+                    axis=0,
+                )
         return self.wb_correction
 
-    def get_colors(self, frame, wb_factors=None):
+    def get_colors(self, frame):
         colors = array([frame[y][x] for y, x in self.indices])
         if self.auto_wb:
             colors *= self.get_color_correction(frame)

@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging
 import uvicorn
 from time import sleep
+from collections import deque
 from fastapi import FastAPI, Form, Request, status
 from fastapi.responses import (
     HTMLResponse,
@@ -13,6 +15,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from modules.colorgrabber import ColorGrabber
 from modules.utils import config, save_config
+
+log = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG, filename='log.log', filemode='w')
 
 app = FastAPI()
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -86,6 +91,11 @@ def get_config():
     return config
 
 
+@app.get('/logs')
+def get_logs():
+    return open('log.log', 'r').readlines()
+
+
 @app.post('/config')
 def post_config(data):
     save_config(data=data)
@@ -125,6 +135,17 @@ def wb():
         green=ColorGrabber().wb_correction[1],
         blue=ColorGrabber().wb_correction[2],
     )
+
+
+@app.get('/wb/queue/{val}')
+def set_wb_frames(val: int):
+    config.colors['queueSize'] = val
+    save_config()
+    ColorGrabber().last_wb_corrections = deque(
+        maxlen=config.colors.get('queueSize', 30)
+    )
+    ColorGrabber().last_wb_weights = deque(maxlen=config.colors.get('queueSize', 30))
+    return RedirectResponse('/')
 
 
 @app.get('/wb/off')
