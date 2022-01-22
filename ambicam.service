@@ -1,0 +1,12 @@
+[Unit]
+Description=run the ambicam server located in ~/ambicam/
+
+Wants=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ubuntu/ambicam/
+ExecStart=/home/ubuntu/ambicam/bin/python /home/ubuntu/ambicam/app.py
+
+[Install]
+WantedBy=multi-user.target
