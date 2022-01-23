@@ -10,8 +10,8 @@ url = "https://www.piwheels.org/simple"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.10"
-opencv-python-headless = "^4.5.4"
-opencv-contrib-python = "^4.5.4"
+opencv-python-headless = "==4.5.3.56"
+opencv-contrib-python = "==4.5.3.56"
 uvicorn = "^0.16.0"
 fastapi = "^0.70.1"
 Jinja2 = "^3.0.3"
