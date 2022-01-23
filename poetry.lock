@@ -161,35 +161,30 @@ reference = "piwheels"
 
 [[package]]
 name = "opencv-contrib-python"
-version = "4.5.5.62"
+version = "4.5.3.56"
 description = "Wrapper package for OpenCV python bindings."
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-numpy = [
-    {version = ">=1.21.2", markers = "python_version >= \"3.6\" and platform_system == \"Darwin\" and platform_machine == \"arm64\""},
-    {version = ">=1.19.3", markers = "python_version >= \"3.6\" and platform_system == \"Linux\" and platform_machine == \"aarch64\" or python_version >= \"3.9\""},
-    {version = ">=1.14.5", markers = "python_version >= \"3.7\""},
-    {version = ">=1.17.3", markers = "python_version >= \"3.8\""},
-]
+numpy = ">=1.14.5"
+
+[package.source]
+type = "legacy"
+url = "https://www.piwheels.org/simple"
+reference = "piwheels"
 
 [[package]]
 name = "opencv-python-headless"
-version = "4.5.5.62"
+version = "4.5.3.56"
 description = "Wrapper package for OpenCV python bindings."
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-numpy = [
-    {version = ">=1.21.2", markers = "python_version >= \"3.6\" and platform_system == \"Darwin\" and platform_machine == \"arm64\""},
-    {version = ">=1.19.3", markers = "python_version >= \"3.6\" and platform_system == \"Linux\" and platform_machine == \"aarch64\" or python_version >= \"3.9\""},
-    {version = ">=1.14.5", markers = "python_version >= \"3.7\""},
-    {version = ">=1.17.3", markers = "python_version >= \"3.8\""},
-]
+numpy = ">=1.14.5"
 
 [package.source]
 type = "legacy"
@@ -314,7 +309,7 @@ reference = "piwheels"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.10"
-content-hash = "27d982fa551ff67349abbe1a2fb720235a0712bc777f49501405f29679ae33c7"
+content-hash = "c6c72d457faf498c0f1f116bc045a6d14accfe406ee74eec93bbc486d471f345"
 
 [metadata.files]
 anyio = [
@@ -352,19 +347,16 @@ numpy = [
     {file = "numpy-1.22.1-cp39-cp39-linux_armv7l.whl", hash = "sha256:ee3c08de299b3e4e86b153b22c813e6255eb2b87839a130431952a45539f4ce9"},
 ]
 opencv-contrib-python = [
-    {file = "opencv-contrib-python-4.5.5.62.tar.gz", hash = "sha256:80b49c7861689f2f6722bd7a826855ecc8b94992ea3534316d5a66f1f20ac141"},
-    {file = "opencv_contrib_python-4.5.5.62-cp36-abi3-macosx_10_15_x86_64.whl", hash = "sha256:bf53d50297dc71e0681bc08025b53d76f9278abdbf0b595980b72dd4a9025cf5"},
-    {file = "opencv_contrib_python-4.5.5.62-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d71960798c029fffdc37f4f07ec356f760a444f66fc217e3e45185f7bbcc77f3"},
-    {file = "opencv_contrib_python-4.5.5.62-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4f2c5e4c6caf11a45415e8bb40bb4a45f6dd76029e8353e9956c6729bedb43ad"},
-    {file = "opencv_contrib_python-4.5.5.62-cp36-abi3-win32.whl", hash = "sha256:fbdddce88a587308c3789b0a34894032af1e962ac38764c44945f23808f16b26"},
-    {file = "opencv_contrib_python-4.5.5.62-cp36-abi3-win_amd64.whl", hash = "sha256:9522404c265825e4527a1b00eeecd6f0adcb22ddef24a91d8a0c2f2b2c348b4e"},
-    {file = "opencv_contrib_python-4.5.5.62-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:abd6d6114b69685fd8201eaa1da2555dc5f419e20a94567f2dd3e8471f3d748b"},
+    {file = "opencv_contrib_python-4.5.3.56-cp37-cp37m-linux_armv6l.whl", hash = "sha256:41faa9bb8647f7720a3253334a982abadaa0731ea0c1a175f72bba935fe31428"},
+    {file = "opencv_contrib_python-4.5.3.56-cp37-cp37m-linux_armv7l.whl", hash = "sha256:41faa9bb8647f7720a3253334a982abadaa0731ea0c1a175f72bba935fe31428"},
+    {file = "opencv_contrib_python-4.5.3.56-cp39-cp39-linux_armv6l.whl", hash = "sha256:f9b99df082746e41292d28b01cb511278b8c4017ba624881879c7fac92cc3449"},
+    {file = "opencv_contrib_python-4.5.3.56-cp39-cp39-linux_armv7l.whl", hash = "sha256:f9b99df082746e41292d28b01cb511278b8c4017ba624881879c7fac92cc3449"},
 ]
 opencv-python-headless = [
-    {file = "opencv_python_headless-4.5.5.62-cp37-cp37m-linux_armv6l.whl", hash = "sha256:122d1e1e7e293eba68e33cde8ffeaef45b4a044021cdd2c73d8b508e57b89cf1"},
-    {file = "opencv_python_headless-4.5.5.62-cp37-cp37m-linux_armv7l.whl", hash = "sha256:122d1e1e7e293eba68e33cde8ffeaef45b4a044021cdd2c73d8b508e57b89cf1"},
-    {file = "opencv_python_headless-4.5.5.62-cp39-cp39-linux_armv6l.whl", hash = "sha256:bebbaf2c46221a99ad21a6f72b888755c6393dd6fc4fb1342e015bb9aee39667"},
-    {file = "opencv_python_headless-4.5.5.62-cp39-cp39-linux_armv7l.whl", hash = "sha256:bebbaf2c46221a99ad21a6f72b888755c6393dd6fc4fb1342e015bb9aee39667"},
+    {file = "opencv_python_headless-4.5.3.56-cp37-cp37m-linux_armv6l.whl", hash = "sha256:ff4de00d4f19d622561dee58a5121045ca265df3665751d14433149bbd748f55"},
+    {file = "opencv_python_headless-4.5.3.56-cp37-cp37m-linux_armv7l.whl", hash = "sha256:ff4de00d4f19d622561dee58a5121045ca265df3665751d14433149bbd748f55"},
+    {file = "opencv_python_headless-4.5.3.56-cp39-cp39-linux_armv6l.whl", hash = "sha256:88f62cb69ba0fe95a57776ba34613a4ee34b8c0b94c5bfd73f74e76536d592c0"},
+    {file = "opencv_python_headless-4.5.3.56-cp39-cp39-linux_armv7l.whl", hash = "sha256:88f62cb69ba0fe95a57776ba34613a4ee34b8c0b94c5bfd73f74e76536d592c0"},
 ]
 pydantic = [
     {file = "pydantic-1.9.0-cp37-cp37m-linux_armv6l.whl", hash = "sha256:5a0b3b684222525d82e4d94c5884f3b01ad20fd783d9f45ca4119ab3e71375b9"},
