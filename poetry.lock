@@ -147,6 +147,35 @@ url = "https://www.piwheels.org/simple"
 reference = "piwheels"
 
 [[package]]
+name = "numpy"
+version = "1.22.1"
+description = "NumPy is the fundamental package for array computing with Python."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.source]
+type = "legacy"
+url = "https://www.piwheels.org/simple"
+reference = "piwheels"
+
+[[package]]
+name = "opencv-contrib-python-headless"
+version = "4.5.5.62"
+description = "Wrapper package for OpenCV python bindings."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+numpy = [
+    {version = ">=1.21.2", markers = "python_version >= \"3.6\" and platform_system == \"Darwin\" and platform_machine == \"arm64\""},
+    {version = ">=1.19.3", markers = "python_version >= \"3.6\" and platform_system == \"Linux\" and platform_machine == \"aarch64\" or python_version >= \"3.9\""},
+    {version = ">=1.14.5", markers = "python_version >= \"3.7\""},
+    {version = ">=1.17.3", markers = "python_version >= \"3.8\""},
+]
+
+[[package]]
 name = "pydantic"
 version = "1.9.0"
 description = "Data validation and settings management using python 3.6 type hinting"
@@ -264,7 +293,7 @@ reference = "piwheels"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.10"
-content-hash = "610da80b65cc5466ffe7c3f8444c9567e2f1514756d04e9336202e49db035548"
+content-hash = "53ca512ca1a09166e3b2754feea46f21f59c6e1b1f5ae024e23267f8d9c5c0bb"
 
 [metadata.files]
 anyio = [
@@ -296,6 +325,19 @@ markupsafe = [
     {file = "MarkupSafe-2.0.1-cp37-cp37m-linux_armv7l.whl", hash = "sha256:060b790af48b3d1cb6776a1e8956fb41106c6befaca717181c41a1728147dc73"},
     {file = "MarkupSafe-2.0.1-cp39-cp39-linux_armv6l.whl", hash = "sha256:b2b16984860d962a9f7f42c8f84ecdb74993b803a705309bb0acea7f032e37e7"},
     {file = "MarkupSafe-2.0.1-cp39-cp39-linux_armv7l.whl", hash = "sha256:b2b16984860d962a9f7f42c8f84ecdb74993b803a705309bb0acea7f032e37e7"},
+]
+numpy = [
+    {file = "numpy-1.22.1-cp39-cp39-linux_armv6l.whl", hash = "sha256:ee3c08de299b3e4e86b153b22c813e6255eb2b87839a130431952a45539f4ce9"},
+    {file = "numpy-1.22.1-cp39-cp39-linux_armv7l.whl", hash = "sha256:ee3c08de299b3e4e86b153b22c813e6255eb2b87839a130431952a45539f4ce9"},
+]
+opencv-contrib-python-headless = [
+    {file = "opencv-contrib-python-headless-4.5.5.62.tar.gz", hash = "sha256:6067dea6419cb52c4d4294d8e452fdd7803213382bfb9f0ac02f0738ecb96766"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-macosx_10_15_x86_64.whl", hash = "sha256:e1676ced72545a050a8b9e26a07832e091363473b2a7c44735babdc2a5a2a405"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ecd910579d4aac4e4ceb696cbe03324de8f70efd47b5b8d296bd80dc7b930ffd"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:785ef5c11859b95d378062a95ee2a5dc34563eab03e592910588bbe7be6496fa"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-win32.whl", hash = "sha256:57f18506d8f2d9c893dee9ef6fc3b1bfcd1cb60ce24a397cbcceda2fdd87be56"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-win_amd64.whl", hash = "sha256:da8d1782c99abcc4e121b944e8965fdee21a575c8c275190e06f374deda0ef00"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:c02eceb8dbc8ee103c3b1468cb5dac33125abd50c0a8ee47fb852f0a25664c7e"},
 ]
 pydantic = [
     {file = "pydantic-1.9.0-cp37-cp37m-linux_armv6l.whl", hash = "sha256:5a0b3b684222525d82e4d94c5884f3b01ad20fd783d9f45ca4119ab3e71375b9"},
