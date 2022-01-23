@@ -10,10 +10,10 @@
         "bottom": 300
     },
     "checkWindow": {
-        "top": 135,
+        "top": 165,
         "left": 125,
-        "bottom": 270,
-        "right": 420
+        "bottom": 330,
+        "right": 400
     },
     "leds": [
         {
@@ -21,7 +21,7 @@
             "leds": 48,
             "from": 0.5,
             "to": 1,
-            "check": false
+            "check": true
         },
         {
             "side": "right",
@@ -66,12 +66,10 @@
         "interpolation": 0
     },
     "colors": {
-        "red": 0.44,
-        "green": 0.48,
-        "blue": 0.5,
-        "brightness": 0.69
+        "red": 0.7,
+        "green": 0.53,
+        "blue": 1.0,
+        "brightness": 1.0
     },
     "smoothing": 0.95,
-    "brightness": 63.0,
-    "saturation": 32.0
 }
