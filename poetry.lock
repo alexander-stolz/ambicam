@@ -110,26 +110,20 @@ optional = false
 python-versions = ">=3.7,<3.11"
 
 [[package]]
-name = "opencv-contrib-python"
-version = "4.5.4.60"
+name = "opencv-contrib-python-headless"
+version = "4.5.5.62"
 description = "Wrapper package for OpenCV python bindings."
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-numpy = ">=1.21.2"
-
-[[package]]
-name = "opencv-python-headless"
-version = "4.5.4.60"
-description = "Wrapper package for OpenCV python bindings."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-numpy = ">=1.21.2"
+numpy = [
+    {version = ">=1.21.2", markers = "python_version >= \"3.6\" and platform_system == \"Darwin\" and platform_machine == \"arm64\""},
+    {version = ">=1.19.3", markers = "python_version >= \"3.6\" and platform_system == \"Linux\" and platform_machine == \"aarch64\" or python_version >= \"3.9\""},
+    {version = ">=1.14.5", markers = "python_version >= \"3.7\""},
+    {version = ">=1.17.3", markers = "python_version >= \"3.8\""},
+]
 
 [[package]]
 name = "pydantic"
@@ -214,7 +208,7 @@ standard = ["httptools (>=0.2.0,<0.4.0)", "watchgod (>=0.6)", "python-dotenv (>=
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.10"
-content-hash = "fb40af564acbf929e28e15dc32fd56136c12e96c25c44bc08ac6e55092dc1c6b"
+content-hash = "64448c5e788cbcf95bbe4008a1dbc6c02f85b3ea83a65e5f9d64ccbeb6241162"
 
 [metadata.files]
 anyio = [
@@ -337,69 +331,14 @@ numpy = [
     {file = "numpy-1.21.4-pp37-pypy37_pp73-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:a3deb31bc84f2b42584b8c4001c85d1934dbfb4030827110bc36bfd11509b7bf"},
     {file = "numpy-1.21.4.zip", hash = "sha256:e6c76a87633aa3fa16614b61ccedfae45b91df2767cf097aa9c933932a7ed1e0"},
 ]
-opencv-contrib-python = [
-    {file = "opencv-contrib-python-4.5.4.60.tar.gz", hash = "sha256:3883eab2466d2ec61599a35049f13c5388c2bb475fbf4e67256b09b9c9546adc"},
-    {file = "opencv_contrib_python-4.5.4.60-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:5d176dce016128240550fd2b3d7d16c4baf8b09718433fca0a897993eb282f5d"},
-    {file = "opencv_contrib_python-4.5.4.60-cp310-cp310-macosx_11_0_x86_64.whl", hash = "sha256:c91b925136a72459990c76e4996292c7265a4debd8b79f7e2a0f815f506eb2ef"},
-    {file = "opencv_contrib_python-4.5.4.60-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c1383f374c32353e12090f2c4a82a352312e318fd6f4353ef3ecb85a5666f2bf"},
-    {file = "opencv_contrib_python-4.5.4.60-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0e262f552309c6e14d227e2a5ac05883071b34fa4620bc92c5e4d242ba405086"},
-    {file = "opencv_contrib_python-4.5.4.60-cp310-cp310-win32.whl", hash = "sha256:a420f8f655897af2b3aa3698c4316012f23aa9d97b1c1951549d77890b9fb486"},
-    {file = "opencv_contrib_python-4.5.4.60-cp310-cp310-win_amd64.whl", hash = "sha256:30822deccc472a41396f0c41f1bb78ba7f9be7a0570c393fb1616c074edcfdc5"},
-    {file = "opencv_contrib_python-4.5.4.60-cp36-cp36m-macosx_10_15_x86_64.whl", hash = "sha256:7b590143d2b66b2319b412213c0d199c67e8e271860e24d81a812f7c124b8cf5"},
-    {file = "opencv_contrib_python-4.5.4.60-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ab8ed9b9350dc3c978aba535bae01e1b5556a747cb694b261160bea176184473"},
-    {file = "opencv_contrib_python-4.5.4.60-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:918ee9b93d2edd366ce06a47ba690e80167a9aff1697a54225eaaf8b5f6218ba"},
-    {file = "opencv_contrib_python-4.5.4.60-cp36-cp36m-win32.whl", hash = "sha256:04da9108ec56065874c1725919b60daa1b4e447bd96ab646271e609fc81a0a66"},
-    {file = "opencv_contrib_python-4.5.4.60-cp36-cp36m-win_amd64.whl", hash = "sha256:9febb96a2dad037b54f4100f0bda190229c5cbc3a4c4e01b6e15156132f82b3b"},
-    {file = "opencv_contrib_python-4.5.4.60-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:04f26541355b3050ab1112b31244bfbccc4ab7733505365708c38a3e8d50dfb4"},
-    {file = "opencv_contrib_python-4.5.4.60-cp37-cp37m-macosx_11_0_arm64.whl", hash = "sha256:28caf69b6db4da76f5013428a5a2791b276b44e79ab9f70ac1a17fd0a208533b"},
-    {file = "opencv_contrib_python-4.5.4.60-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:debc5058fea20b4981b752218236424e0d9844a193c40ac98c3a74c03e82d277"},
-    {file = "opencv_contrib_python-4.5.4.60-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f8058c16abe7bea9931b8f882b1f31d0e3401365c1ad6e853be24127a1d1b8e8"},
-    {file = "opencv_contrib_python-4.5.4.60-cp37-cp37m-win32.whl", hash = "sha256:dc36943cdbb102a4e1a8390b27eb57ae8325038c24ce7cef3426e999406ad7fa"},
-    {file = "opencv_contrib_python-4.5.4.60-cp37-cp37m-win_amd64.whl", hash = "sha256:82e528bef86eab4ab349ff9e1271044b2b5c193b55d996b377473e73e3cbf2bf"},
-    {file = "opencv_contrib_python-4.5.4.60-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:bcc912e9b78fe3f971f1e3f41104836322aa329c5f63197f4cf9942d30b69f6f"},
-    {file = "opencv_contrib_python-4.5.4.60-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:192a6deae66dfa8c9ddefed648b3e5426064b4505e4a0d3bee84bfdf30c8721d"},
-    {file = "opencv_contrib_python-4.5.4.60-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:591aafc520012d39ed02f7539b6867a5f675d66096e4975caeddd54eb8c7eb8d"},
-    {file = "opencv_contrib_python-4.5.4.60-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1af5e0bd242b13ceaf1d0701c93cb049e4a4d1aacc0b27f2c8994488aa4a4fee"},
-    {file = "opencv_contrib_python-4.5.4.60-cp38-cp38-win32.whl", hash = "sha256:ca45f1d5c55aab5caecc303d70abc1b21aff8c4db26a44f479b637f8b2c0686f"},
-    {file = "opencv_contrib_python-4.5.4.60-cp38-cp38-win_amd64.whl", hash = "sha256:8cec83d99a64991c81cdd3e96fbe5ec7e31dc83504ca7db64419c267f55fde61"},
-    {file = "opencv_contrib_python-4.5.4.60-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:1334c943aa6778f2a07f583d4cd9349bdc4fa5d37574aa7392b4bbb9de7b1fb5"},
-    {file = "opencv_contrib_python-4.5.4.60-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:266bbb889b7d802cf9bd19f9e7e7781d8c4eefc2dd4239bc7457c9b941c24d71"},
-    {file = "opencv_contrib_python-4.5.4.60-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f9fea4651419f69947e125861c87be1bac980dc0f6537b0c1573fe9ada82c444"},
-    {file = "opencv_contrib_python-4.5.4.60-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ec2ae7cefb5715da1ef6a72912d270cec9c973e87d5213f3792a17cd369d416f"},
-    {file = "opencv_contrib_python-4.5.4.60-cp39-cp39-win32.whl", hash = "sha256:d954c9af03e383905ec7c68b524817d676a311d5a94cc8b5383ec1bf92027230"},
-    {file = "opencv_contrib_python-4.5.4.60-cp39-cp39-win_amd64.whl", hash = "sha256:9bfe29d62a2001cde2f93a75173917ed40e62e4a5f1ee2af98800143a2ebee66"},
-]
-opencv-python-headless = [
-    {file = "opencv-python-headless-4.5.4.60.tar.gz", hash = "sha256:6e7710aff3a0717f39c9ade77fdd9111203b09589539655044e73cc5d9960666"},
-    {file = "opencv_python_headless-4.5.4.60-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:4ef93f338b16e95418b69293924745a36f23e3d05da5ee10dde76af72b0889e3"},
-    {file = "opencv_python_headless-4.5.4.60-cp310-cp310-macosx_11_0_x86_64.whl", hash = "sha256:659107ea6059b5cc953e1a32136a54998540cefea47b01dd62f1e806d10cbe39"},
-    {file = "opencv_python_headless-4.5.4.60-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5009a183be7a6817ff216dcb63ef95022c74e360011fa52aa33bc833256693b5"},
-    {file = "opencv_python_headless-4.5.4.60-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6d949ec3e10cffa915ab1853e490674b8c420ba29eb0aeea72785f3e254dc7a1"},
-    {file = "opencv_python_headless-4.5.4.60-cp310-cp310-win32.whl", hash = "sha256:a1fd5bbf5db00432fb368c73e7d70ead13f69619b33e01dabf2906426a1a9277"},
-    {file = "opencv_python_headless-4.5.4.60-cp310-cp310-win_amd64.whl", hash = "sha256:bbf37d5de98b09e7513e61fca6ebf6466fd82c3c2f0475e51d2a3c80e0bc1a92"},
-    {file = "opencv_python_headless-4.5.4.60-cp36-cp36m-macosx_10_15_x86_64.whl", hash = "sha256:01f76ca55fdb7e94c3e7eab5035376d06518155e3d88a08096e4670e57a0cee4"},
-    {file = "opencv_python_headless-4.5.4.60-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bc9502064e8c3ff6f40b74c8a68fb31d0c9eae18c1d3f52d4e3f0ccda986f7cb"},
-    {file = "opencv_python_headless-4.5.4.60-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:99e678db353102119cbfe9d17aef520bacf585a3a287c4278dd1ce6fcd3be8f7"},
-    {file = "opencv_python_headless-4.5.4.60-cp36-cp36m-win32.whl", hash = "sha256:8f8a06f75dc69631404e0846038d30ff43c9a9d60fcffe07c7a88f8b8c8c776c"},
-    {file = "opencv_python_headless-4.5.4.60-cp36-cp36m-win_amd64.whl", hash = "sha256:3a8457918ecbca57669f141e7dba92e56af370876d022d75d58b94174d11e26b"},
-    {file = "opencv_python_headless-4.5.4.60-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:cdea7ab1698b69274eb69b16efdd7b16944c5019c06f0ace9530f91862496cf4"},
-    {file = "opencv_python_headless-4.5.4.60-cp37-cp37m-macosx_11_0_arm64.whl", hash = "sha256:7da49405e163b7a2cf891bf54a877ff3e198bc0bfe55009c1d19eb5a0153921d"},
-    {file = "opencv_python_headless-4.5.4.60-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7b4bd3c6a0d2601b2619ae406eb85a41dff538a7c9cb2a54fb1e90631bf33887"},
-    {file = "opencv_python_headless-4.5.4.60-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cdfec5dedd44617d94725170446cbe77c0b45044188bdc97cd251e698aeee822"},
-    {file = "opencv_python_headless-4.5.4.60-cp37-cp37m-win32.whl", hash = "sha256:f4fbd431b2b0014b7d99e870f428eebf50a0149e4be1a72b905569aaadf4b540"},
-    {file = "opencv_python_headless-4.5.4.60-cp37-cp37m-win_amd64.whl", hash = "sha256:29f5372dabdcd571074f0539bd294a2f5a245a00b871827af6d75a971b3f657e"},
-    {file = "opencv_python_headless-4.5.4.60-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:33e534fbc7a417a05ef6b14812fe8ff6b6b7152c22d502b61536c50ad63f80cb"},
-    {file = "opencv_python_headless-4.5.4.60-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:5331ce17a094bea4f8132ee23b2eaade85904199c0d04501102c9bb889302c67"},
-    {file = "opencv_python_headless-4.5.4.60-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:03349d9fb28703b2eaa8b1f333a6139b9849596ae4445cb1d76e2a7f5e4a2cf8"},
-    {file = "opencv_python_headless-4.5.4.60-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:eb9e571427b7f44b8d8f9a3b6b7b25e45bc8e8895ed3cf3ecd917c0125cf3477"},
-    {file = "opencv_python_headless-4.5.4.60-cp38-cp38-win32.whl", hash = "sha256:7f8dd594ea0b0049d1614d7bfba984ebd926b2f12670edf6ae3d9d5d6ff8f8f0"},
-    {file = "opencv_python_headless-4.5.4.60-cp38-cp38-win_amd64.whl", hash = "sha256:db112fe9ffde7af96df09befcefdd33c4338f3a34fbfe894e04e66e14f584d9e"},
-    {file = "opencv_python_headless-4.5.4.60-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:30261b87477a718993fa7cd8a44b7de986b81f8005e23110978c58fd53eb5e43"},
-    {file = "opencv_python_headless-4.5.4.60-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:db461f2f0bfac155d56be7688ab6b43c140ce8b944aa5e6cfcb754bfeeeca750"},
-    {file = "opencv_python_headless-4.5.4.60-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a6ba305364df31b8ac8471a719371d0c05e1e5f7cc5b8a2295e7e958f9bc39bb"},
-    {file = "opencv_python_headless-4.5.4.60-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:dc303a5e09089001fd4fd51bd18a6d519e81ad5cbc36bb4b5fc3388d22a64be1"},
-    {file = "opencv_python_headless-4.5.4.60-cp39-cp39-win32.whl", hash = "sha256:a5461ad9789c784e75713d6c213c0e34b709073c71ec8ed94129419ea0ce7c01"},
-    {file = "opencv_python_headless-4.5.4.60-cp39-cp39-win_amd64.whl", hash = "sha256:a1f9d41c6afe86fdbe85ac31ff9a6ce893af2d0fce68fbd1581dbbc0e4dfcb25"},
+opencv-contrib-python-headless = [
+    {file = "opencv-contrib-python-headless-4.5.5.62.tar.gz", hash = "sha256:6067dea6419cb52c4d4294d8e452fdd7803213382bfb9f0ac02f0738ecb96766"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-macosx_10_15_x86_64.whl", hash = "sha256:e1676ced72545a050a8b9e26a07832e091363473b2a7c44735babdc2a5a2a405"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ecd910579d4aac4e4ceb696cbe03324de8f70efd47b5b8d296bd80dc7b930ffd"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:785ef5c11859b95d378062a95ee2a5dc34563eab03e592910588bbe7be6496fa"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-win32.whl", hash = "sha256:57f18506d8f2d9c893dee9ef6fc3b1bfcd1cb60ce24a397cbcceda2fdd87be56"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp36-abi3-win_amd64.whl", hash = "sha256:da8d1782c99abcc4e121b944e8965fdee21a575c8c275190e06f374deda0ef00"},
+    {file = "opencv_contrib_python_headless-4.5.5.62-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:c02eceb8dbc8ee103c3b1468cb5dac33125abd50c0a8ee47fb852f0a25664c7e"},
 ]
 pydantic = [
     {file = "pydantic-1.8.2-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:05ddfd37c1720c392f4e0d43c484217b7521558302e7069ce8d318438d297739"},
