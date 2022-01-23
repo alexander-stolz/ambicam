@@ -3,3 +3,4 @@ static/frame.jpg
 modules/__pycache__/
 __pycache__/
 *.pyc
+config.json
