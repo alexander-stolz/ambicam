@@ -4,15 +4,19 @@ version = "0.1.0"
 description = ""
 authors = ["Alexander M. Stolz <alexander.stolz@dvs.ag>"]
 
+[[tool.poetry.source]]
+name = "piwheels"
+url = "https://www.piwheels.org/simple"
+
 [tool.poetry.dependencies]
 python = ">=3.9,<3.10"
-# opencv-python-headless = "^4.5.4"
-# opencv-contrib-python = "^4.5.4"
+opencv-python-headless = "^4.5.4"
+opencv-contrib-python = "^4.5.4"
 uvicorn = "^0.16.0"
 fastapi = "^0.70.1"
 Jinja2 = "^3.0.3"
 python-multipart = "^0.0.5"
-opencv-contrib-python-headless = "^4.5.5"
+# opencv-contrib-python-headless = "^4.5.5"
 
 [tool.poetry.dev-dependencies]
 
