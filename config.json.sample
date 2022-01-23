@@ -3,6 +3,7 @@
         "width": 640,
         "height": 480
     },
+    "cameraInterface": "cv2",
     "window": {
         "left": 140,
         "top": 205,

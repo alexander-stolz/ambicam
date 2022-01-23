@@ -1,12 +1,17 @@
 import logging
 import cv2
 from time import sleep
-from numpy import arange, array, linspace, ndarray, average
+from collections import deque
 import threading
+from numpy import array, linspace, average
 from modules.telnet import TelnetConnection
 from modules.utils import config
-from modules.camera import Cv2Camera as Camera
-from collections import deque
+
+if config.get('cameraInterface', 'cv2') == 'picamera':
+    from modules.camera import PiCamera as Camera
+else:
+    from modules.camera import Cv2Camera as Camera
+
 
 log = logging.getLogger(__name__)
 
