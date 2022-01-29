@@ -2,9 +2,8 @@ from abc import ABC, abstractmethod
 from numpy import ndarray
 from time import sleep
 import cv2
-from io import BytesIO
-import numpy as np
 from modules.utils import config
+from os import system
 
 
 class AbstractCamera(ABC):
@@ -54,6 +53,9 @@ class Cv2Camera(AbstractCamera):
     _frame = None
 
     def connect(self):
+        system('v4l2-ctl --set-ctrl=white_balance_auto_preset=0')
+        system('v4l2-ctl --set-ctrl=red_balance=1500')
+        system('v4l2-ctl --set-ctrl=blue_balance=1500')
         self.vid = cv2.VideoCapture(0)
         self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, config.resolution['width'])
         self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, config.resolution['height'])

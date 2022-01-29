@@ -1,0 +1,18 @@
+# PREPARE RASPBERRY
+- start raspberry pi imager
+- select __ubuntu server 32 bit__ (64 bit does not support camera)
+- press ctrl + shift + x to configure raspberry without monitor
+- write to sd card
+- `sudo apt update && sudo apt upgrade`
+- `sudo apt install raspi-config`
+- find camera: `df -h`
+- `sudo mount /dev/mmcblk0p1 /boot` (mmcblk0p1 = camera)
+- /boot/firmware/config.txt -> append line `start_x=1`
+- `sudo reboot 0`
+- `sudo raspi-config` -> intercaces -> enable camera
+- `sudo apt install pip`
+- `sudo reboot 0`
+- `python3 -m pip install poetry --user`
+- logout/login
+- `git clone https://github.com/alexander-stolz/ambicam.git`
+- `cd ambicam && poetry install`
