@@ -1,9 +1,12 @@
 import json
+import logging
 from types import SimpleNamespace
 from time import sleep, perf_counter as time
 import threading
 from numpy import arange, array, linspace
 from modules.utils import config
+
+log = logging.getLogger()
 
 
 class TelnetConnection(threading.Thread):
@@ -16,6 +19,7 @@ class TelnetConnection(threading.Thread):
         self.dt = 0.1
         self.last_time = time()
         self.new_colors = None
+        self.last_command = ''
 
     def connect(self):
         if not config.telnet.get('host'):
@@ -45,6 +49,9 @@ class TelnetConnection(threading.Thread):
             )
             + ';'
         )
+        if cmd == self.last_command:
+            return 0
+        self.last_command = cmd
         t = time()
         self.send(cmd)
         return time() - t
@@ -66,9 +73,6 @@ class TelnetConnection(threading.Thread):
             last_colors = new_colors or self.new_colors
             new_colors = self.new_colors
             self.new_colors = None
-            if last_colors == new_colors:
-                # reduce network traffic
-                continue
             colors_slope = (array(new_colors, float) - array(last_colors, float)) / (
                 self.dt or 0.1
             )
