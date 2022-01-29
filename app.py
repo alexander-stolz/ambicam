@@ -3,8 +3,8 @@
 
 import logging
 import uvicorn
+import os
 from time import sleep
-from os import mkdir
 from collections import deque
 from fastapi import FastAPI, Form, Request, status
 from fastapi.responses import (
@@ -20,7 +20,9 @@ from modules.utils import config, save_config
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, filename='log.log', filemode='w')
 
-mkdir('static', exist_ok=True)
+# create static folder if not exists
+if not os.path.exists('static'):
+    os.mkdir('static')
 
 app = FastAPI()
 app.mount('/static', StaticFiles(directory='static'), name='static')
