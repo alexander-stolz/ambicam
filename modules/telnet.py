@@ -66,6 +66,9 @@ class TelnetConnection(threading.Thread):
             last_colors = new_colors or self.new_colors
             new_colors = self.new_colors
             self.new_colors = None
+            if last_colors == new_colors:
+                # reduce network traffic
+                continue
             colors_slope = (array(new_colors, float) - array(last_colors, float)) / (
                 self.dt or 0.1
             )
