@@ -4,6 +4,7 @@
 import logging
 import uvicorn
 from time import sleep
+from os import mkdir
 from collections import deque
 from fastapi import FastAPI, Form, Request, status
 from fastapi.responses import (
@@ -18,6 +19,8 @@ from modules.utils import config, save_config
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, filename='log.log', filemode='w')
+
+mkdir('static', exist_ok=True)
 
 app = FastAPI()
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -130,6 +133,8 @@ def dt():
 
 @app.get('/wb')
 def wb():
+    if not ColorGrabber().wb_correction:
+        return 'automatic white balance correction is disabled'
     return dict(
         red=ColorGrabber().wb_correction[0],
         green=ColorGrabber().wb_correction[1],
