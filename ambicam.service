@@ -6,7 +6,7 @@ Wants=network.target
 [Service]
 Type=simple
 WorkingDirectory=/home/pi/ambicam/
-ExecStart=/home/pi/ambicam/bin/python /home/pi/ambicam/app.py
+ExecStart=/home/pi/ambicam/.venv/bin/python /home/pi/ambicam/app.py
 
 [Install]
 WantedBy=multi-user.target
