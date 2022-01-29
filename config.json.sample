@@ -72,5 +72,5 @@
         "blue": 0.67,
         "brightness": 1.0
     },
-    "smoothing": 0.95,
+    "smoothing": 0.95
 }
