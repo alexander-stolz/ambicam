@@ -116,14 +116,14 @@ def saturation(val: float):
 
 @app.get('/smoothing_up')
 def smoothing_up():
-    config.smoothing += 0.05
+    config.smoothing += (1 - config.smoothing) * 0.15
     save_config()
     return RedirectResponse('/')
 
 
 @app.get('/smoothing_down')
 def smoothing_down():
-    config.smoothing -= 0.05
+    config.smoothing -= (1 - config.smoothing) * 0.15
     save_config()
     return RedirectResponse('/')
 
