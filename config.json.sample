@@ -5,16 +5,16 @@
     },
     "cameraInterface": "cv2",
     "window": {
-        "left": 140,
+        "left": 135,
         "top": 205,
-        "right": 385,
+        "right": 380,
         "bottom": 300
     },
     "checkWindow": {
-        "top": 165,
-        "left": 125,
-        "bottom": 330,
-        "right": 400
+        "top": 170,
+        "left": 115,
+        "bottom": 335,
+        "right": 395
     },
     "leds": [
         {
@@ -22,28 +22,28 @@
             "leds": 48,
             "from": 0.5,
             "to": 1,
-            "check": true
+            "check": false
         },
         {
             "side": "right",
             "leds": 54,
             "from": 1,
             "to": 0,
-            "check": true
+            "check": false
         },
         {
             "side": "top",
             "leds": 96,
             "from": 1,
             "to": 0,
-            "check": true
+            "check": false
         },
         {
             "side": "left",
             "leds": 54,
             "from": 0,
             "to": 1,
-            "check": true
+            "check": false
         },
         {
             "side": "bottom",
@@ -67,9 +67,9 @@
         "interpolation": 0
     },
     "colors": {
-        "red": 0.7,
-        "green": 0.53,
-        "blue": 1.0,
+        "red": 0.57,
+        "green": 0.62,
+        "blue": 0.67,
         "brightness": 1.0
     },
     "smoothing": 0.95,
