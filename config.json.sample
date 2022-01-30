@@ -6,9 +6,9 @@
     "cameraInterface": "cv2",
     "v4l2": {
         "white_balance_auto_preset": 0,
-        "red_balance": 1500,
-        "blue_balance": 1500,
-        "saturation": -30
+        "red_balance": 1430,
+        "blue_balance": 1400,
+        "saturation": -10
     },
     "window": {
         "left": 135,

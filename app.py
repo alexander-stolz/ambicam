@@ -108,7 +108,7 @@ def post_config(data):
 
 
 @app.get('/smoothing/{val}')
-def saturation(val: float):
+def smoothing(val: float):
     config.smoothing = val
     save_config()
     return RedirectResponse('/')
@@ -124,6 +124,29 @@ def smoothing_up():
 @app.get('/smoothing_down')
 def smoothing_down():
     config.smoothing -= (1 - config.smoothing) * 0.15
+    save_config()
+    return RedirectResponse('/')
+
+@app.get('/saturation/{val}')
+def saturation(val: int):
+    config.v4l2['saturation'] = val
+    os.system(f'v4l2-ctl --set-ctrl=saturation={config.v4l2["saturation"]}')
+    save_config()
+    return RedirectResponse('/')
+
+
+@app.get('/saturation_up')
+def saturation_up():
+    config.v4l2['saturation'] += 10
+    os.system(f'v4l2-ctl --set-ctrl=saturation={config.v4l2["saturation"]}')
+    save_config()
+    return RedirectResponse('/')
+
+
+@app.get('/saturation_down')
+def saturation_down():
+    config.v4l2['saturation'] -= 10
+    os.system(f'v4l2-ctl --set-ctrl=saturation={config.v4l2["saturation"]}')
     save_config()
     return RedirectResponse('/')
 
