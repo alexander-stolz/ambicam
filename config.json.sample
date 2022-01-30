@@ -4,6 +4,12 @@
         "height": 480
     },
     "cameraInterface": "cv2",
+    "v4l2": {
+        "white_balance_auto_preset": 0,
+        "red_balance": 1500,
+        "blue_balance": 1500,
+        "saturation": -30
+    },
     "window": {
         "left": 135,
         "top": 205,

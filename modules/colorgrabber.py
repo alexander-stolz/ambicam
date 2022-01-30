@@ -1,4 +1,5 @@
 import logging
+import os
 import cv2
 from time import sleep
 from collections import deque
@@ -58,6 +59,8 @@ class ColorGrabber(threading.Thread):
 
     def connect_to_camera(self):
         print("connect camera")
+        for property, value in config.get('v4120', {}).items():
+            os.system(f'v4l2-ctl --set-ctrl={property}={value}')
         self.camera = Camera()
         self.camera.connect()
 
