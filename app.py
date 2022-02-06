@@ -93,7 +93,7 @@ def colors_cmd(cmd: str):
         new_colors['red'],
         new_colors['green'],
         new_colors['blue'],
-        new_colors['brightness'],
+        new_colors['brightness'] * 100,
     )
 
 
