@@ -192,7 +192,7 @@ def dt():
 
 @app.get('/wb')
 def wb():
-    if not ColorGrabber().wb_correction:
+    if ColorGrabber().wb_correction is None:
         return 'automatic white balance correction is disabled'
     return dict(
         red=ColorGrabber().wb_correction[0],
