@@ -200,7 +200,7 @@ class ColorGrabber(threading.Thread):
 
     def get_colors(self, frame):
         colors = array([frame[y][x] for y, x in self.indices])
-        if self.auto_wb:
+        if config.auto_wb:
             colors *= self.get_color_correction(frame)
         if config.colors is not None:
             weights = array([config.colors.get(c, 1) for c in ['blue', 'green', 'red']])

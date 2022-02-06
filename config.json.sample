@@ -35,21 +35,21 @@
             "leds": 54,
             "from": 1,
             "to": 0,
-            "check": false
+            "check": true
         },
         {
             "side": "top",
             "leds": 96,
             "from": 1,
             "to": 0,
-            "check": false
+            "check": true
         },
         {
             "side": "left",
             "leds": 54,
             "from": 0,
             "to": 1,
-            "check": false
+            "check": true
         },
         {
             "side": "bottom",
@@ -78,5 +78,6 @@
         "blue": 0.67,
         "brightness": 1.0
     },
+    "auto_wb": false,
     "smoothing": 0.95
 }

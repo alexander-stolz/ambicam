@@ -30,7 +30,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 @app.get('/', response_class=HTMLResponse)
-def root(request: Request):
+def index(request: Request):
     color_grabber = ColorGrabber()
     if color_grabber.running:
         color_grabber.save_frame('static/frame.jpg')
@@ -47,20 +47,53 @@ def root(request: Request):
 
 @app.post('/colors')
 def colors(
-    request: Request,
     red: float = Form(...),
     green: float = Form(...),
     blue: float = Form(...),
     brightness: float = Form(...),
 ):
+    max_val = max(red, green, blue)
     config.colors = {
-        'red': red / 100,
-        'green': green / 100,
-        'blue': blue / 100,
+        'red': red / max_val,
+        'green': green / max_val,
+        'blue': blue / max_val,
         'brightness': brightness / 100,
     }
     save_config()
     return RedirectResponse('/', status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.get('/colors/{cmd}')
+def colors_cmd(cmd: str):
+    new_colors = config.colors
+    if cmd == 'red_up':
+        new_colors['red'] += 0.05
+    if cmd == 'red_down':
+        new_colors['red'] -= 0.05
+    if cmd == 'green_up':
+        new_colors['green'] += 0.05
+    if cmd == 'green_down':
+        new_colors['green'] -= 0.05
+    if cmd == 'blue_up':
+        new_colors['blue'] += 0.05
+    if cmd == 'blue_down':
+        new_colors['blue'] -= 0.05
+    if cmd == 'brightness_up':
+        new_colors['brightness'] += 0.05
+        new_colors['brightness'] = max(min(new_colors['brightness'], 1), 0)
+    if cmd == 'brightness_down':
+        new_colors['brightness'] -= 0.05
+        new_colors['brightness'] = max(min(new_colors['brightness'], 1), 0)
+    if cmd == 'auto_colors' and ColorGrabber().wb_correction is not None:
+        new_colors['red'] *= ColorGrabber().wb_correction[0]
+        new_colors['green'] *= ColorGrabber().wb_correction[1]
+        new_colors['blue'] *= ColorGrabber().wb_correction[2]
+    return colors(
+        new_colors['red'],
+        new_colors['green'],
+        new_colors['blue'],
+        new_colors['brightness'],
+    )
 
 
 @app.get('/stream')
@@ -126,6 +159,7 @@ def smoothing_down():
     config.smoothing -= (1 - config.smoothing) * 0.15
     save_config()
     return RedirectResponse('/')
+
 
 @app.get('/saturation/{val}')
 def saturation(val: int):
