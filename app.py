@@ -86,9 +86,9 @@ def colors_cmd(cmd: str):
         new_colors['brightness'] -= 0.05
         new_colors['brightness'] = max(min(new_colors['brightness'], 1), 0)
     if cmd == 'auto_colors' and ColorGrabber().wb_correction is not None:
-        new_colors['red'] *= ColorGrabber().wb_correction[0]
+        new_colors['red'] *= ColorGrabber().wb_correction[2]
         new_colors['green'] *= ColorGrabber().wb_correction[1]
-        new_colors['blue'] *= ColorGrabber().wb_correction[2]
+        new_colors['blue'] *= ColorGrabber().wb_correction[0]
     return colors(
         new_colors['red'],
         new_colors['green'],
