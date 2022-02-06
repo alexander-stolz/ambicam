@@ -11,6 +11,7 @@ from fastapi.responses import (
     HTMLResponse,
     RedirectResponse,
     StreamingResponse,
+    JSONResponse,
 )
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -195,9 +196,9 @@ def wb():
     if ColorGrabber().wb_correction is None:
         return 'automatic white balance correction is disabled'
     return dict(
-        red=ColorGrabber().wb_correction[0],
-        green=ColorGrabber().wb_correction[1],
-        blue=ColorGrabber().wb_correction[2],
+        red=float(ColorGrabber().wb_correction[0]),
+        green=float(ColorGrabber().wb_correction[1]),
+        blue=float(ColorGrabber().wb_correction[2]),
     )
 
 
