@@ -5,7 +5,7 @@ from time import sleep
 from collections import deque
 import threading
 from numpy import array, linspace, average
-from modules.telnet import TelnetConnection
+from modules.servers import BridgeConnection, PrismatikConnection, DummyConnection
 from modules.utils import config
 
 if config.get('cameraInterface', 'cv2') == 'picamera':
@@ -35,7 +35,7 @@ class ColorGrabber(threading.Thread):
             print("Creating new instance")
             cls._instance = super(ColorGrabber, cls).__new__(cls, *args, **kwargs)
             super().__init__(cls._instance)
-            cls._instance.connect_to_telnet()
+            cls._instance.connect_to_server()
             cls._instance.connect_to_camera()
             cls._instance.last_wb_corrections = deque(
                 maxlen=config.colors.get('queueSize', 150)
@@ -52,10 +52,18 @@ class ColorGrabber(threading.Thread):
                     break
         return cls._instance
 
-    def connect_to_telnet(self):
-        print("connect telnet")
-        self.tn = TelnetConnection(config.telnet['host'], config.telnet['port'])
-        self.tn.connect()
+    def connect_to_server(self):
+        print("connect server")
+        server_type = config.get('server', 'dummy')
+        if server_type not in config and server_type != 'dummy':
+            raise ValueError(f'Unknown server type: {server_type}')
+        if server_type == 'prismatik':
+            self.server = PrismatikConnection()
+        elif server_type == 'bridge':
+            self.server = BridgeConnection()
+        else:
+            self.server = DummyConnection()
+        self.server.connect(**config.get(server_type, {}))
 
     def connect_to_camera(self):
         print("connect camera")
@@ -225,11 +233,11 @@ class ColorGrabber(threading.Thread):
                     frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
                 colors = self.get_colors(frame)
                 # color format: BGR
-                self.tn.colors = colors
+                self.server.update_colors(colors)
         finally:
             self.running = False
             self.camera.disconnect()
-            self.tn.stop()
+            self.server.stop()
             ColorGrabber._instance = None
             self._frame = None
             self._indices = None

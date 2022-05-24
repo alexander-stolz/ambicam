@@ -11,7 +11,6 @@ from fastapi.responses import (
     HTMLResponse,
     RedirectResponse,
     StreamingResponse,
-    JSONResponse,
 )
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -28,6 +27,17 @@ if not os.path.exists('static'):
 app = FastAPI()
 app.mount('/static', StaticFiles(directory='static'), name='static')
 templates = Jinja2Templates(directory="templates")
+
+
+@app.get('/remote')
+def remote(request: Request):
+    return templates.TemplateResponse(
+        'remote.html',
+        {
+            'request': request,
+            'config': config,
+        },
+    )
 
 
 @app.get('/', response_class=HTMLResponse)
@@ -113,7 +123,9 @@ def start():
 
 @app.get('/start/force')
 def force_start():
+    ColorGrabber().stop()
     ColorGrabber._instance = None
+    sleep(0.5)
     color_grabber = ColorGrabber()
     return {'running': color_grabber.running}
 
@@ -188,7 +200,7 @@ def saturation_down():
 
 @app.get('/dt')
 def dt():
-    return {'dt': ColorGrabber().tn.dt}
+    return {'dt': ColorGrabber().server.dt}
 
 
 @app.get('/wb')

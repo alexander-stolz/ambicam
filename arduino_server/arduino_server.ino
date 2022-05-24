@@ -35,7 +35,7 @@ const uint8_t
 
 // --- Serial Settings
 const unsigned long
-    SerialSpeed = 115200; // serial port speed
+    SerialSpeed = 500000; // serial port speed
 const uint16_t
     SerialTimeout = 60; // time before LEDs are shut off if no data (in seconds), 0 to disable
 
@@ -266,7 +266,7 @@ void timeouts()
         // If no data received for an extended time, turn off all LEDs.
         if (SerialTimeout != 0 && (t - lastByteTime) >= (uint32_t)SerialTimeout * 1000)
         {
-            memset(leds, 0, Num_Leds * sizeof(struct CRGB)); //filling Led array by zeroes
+            memset(leds, 0, Num_Leds * sizeof(struct CRGB)); // filling Led array by zeroes
             FastLED.show();
             mode = Header;
             lastByteTime = t; // Reset counter
