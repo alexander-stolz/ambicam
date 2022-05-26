@@ -1,0 +1,13 @@
+[Unit]
+Description=run the port publisher located in ~/
+
+Wants=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/
+ExecStart=python /home/pi/publish_port.py /dev/ttyACM0 500000 --localport 7000
+
+[Install]
+WantedBy=multi-user.target

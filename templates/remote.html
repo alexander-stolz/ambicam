@@ -27,6 +27,7 @@
     .btn-title {
       background-color: #0DCAF0;
       color: black;
+      min-width: 7em;
     }
 
     .btn-inaktiv {
@@ -82,40 +83,93 @@
   <div class="container gap-2 col-9">
     <div class="btn-group" role="group">
       <a class="btn btn-title" href="">red</a>
-      <a class="btn btn-secondary" href="/colors/red_down">-</a>
-      <a class="btn btn-secondary" href="/colors/red_up">+</a>
+      <a id="red_down" class="btn btn-secondary" href="#">-</a>
+      <a id="red_up" class="btn btn-secondary" href="#">+</a>
     </div>
     <div class="btn-group" role="group">
       <a class="btn btn-title" href="">green</a>
-      <a class="btn btn-secondary" href="/colors/green_down">-</a>
-      <a class="btn btn-secondary" href="/colors/green_up">+</a>
+      <a id="green_down" class="btn btn-secondary" href="#">-</a>
+      <a id="green_up" class="btn btn-secondary" href="#">+</a>
     </div>
     <div class="btn-group" role="group">
       <a class="btn btn-title" href="">blue</a>
-      <a class="btn btn-secondary" href="/colors/blue_down">-</a>
-      <a class="btn btn-secondary" href="/colors/blue_up">+</a>
+      <a id="blue_down" class="btn btn-secondary" href="#">-</a>
+      <a id="blue_up" class="btn btn-secondary" href="#">+</a>
     </div>
     <div class="btn-group" role="group">
       <a class="btn btn-title" href="">brightness</a>
-      <a class="btn btn-secondary" href="/colors/brightness_down">-</a>
-      <a class="btn btn-secondary" href="/colors/brightness_up">+</a>
+      <a id="brightness_down" class="btn btn-secondary" href="#">-</a>
+      <a id="brightness_up" class="btn btn-secondary" href="#">+</a>
     </div>
     <div class="btn-group" role="group">
       <a class="btn btn-title" href="">saturation</a>
-      <a class="btn btn-secondary" href="/saturation_down">-</a>
-      <a class="btn btn-secondary" href="/saturation_up">+</a>
+      <a id="saturation_down" class="btn btn-secondary" href="#">-</a>
+      <a id="saturation_up" class="btn btn-secondary" href="#">+</a>
     </div>
     <div class="btn-group" role="group">
       <a class="btn btn-title" href="">smoothing</a>
-      <a class="btn btn-secondary" href="/smoothing_down">-</a>
-      <a class="btn btn-secondary" href="/smoothing_up">+</a>
+      <a id="smoothing_down" class="btn btn-secondary" href="#">-</a>
+      <a id="smoothing_up" class="btn btn-secondary" href="#">+</a>
     </div>
     <div class="btn-group" role="group">
-      <a class="btn btn-title" href="">control</a>
-      <a class="btn btn-secondary" href="/start">start</a>
-      <a class="btn btn-secondary" href="/stop">stop</a>
+      <a id="start" class="btn btn-primary" href="#">start</a>
+      <a id="stop" class="btn btn-primary" href="#">stop</a>
+      <a id="force" class="btn btn-primary" href="#">force</a>
+      <a id="log" class="btn btn-secondary" href="/logs">logs</a>
     </div>
   </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+    $("#red_down").on("click", function () {
+      $.get("/colors/red_down");
+    });
+    $("#red_up").on("click", function () {
+      $.get("/colors/red_up");
+    });
+    $("#green_down").on("click", function () {
+      $.get("/colors/green_down");
+    });
+    $("#green_up").on("click", function () {
+      $.get("/colors/green_up");
+    });
+    $("#blue_down").on("click", function () {
+      $.get("/colors/blue_down");
+    });
+    $("#blue_up").on("click", function () {
+      $.get("/colors/blue_up");
+    });
+    $("#brightness_down").on("click", function () {
+      $.get("/colors/brightness_down");
+    });
+    $("#brightness_up").on("click", function () {
+      $.get("/colors/brightness_up");
+    });
+    $("#saturation_down").on("click", function () {
+      $.get("/saturation_down");
+    });
+    $("#saturation_up").on("click", function () {
+      $.get("/saturation_up");
+    });
+    $("#smoothing_down").on("click", function () {
+      $.get("/smoothing_down");
+    });
+    $("#smoothing_up").on("click", function () {
+      $.get("/smoothing_up");
+    });
+    $("#start").on("click", function () {
+      $.get("/start");
+      window.location.reload();
+    });
+    $("#stop").on("click", function () {
+      $.get("/stop");
+      window.location.reload();
+    });
+    $("#force").on("click", function () {
+      $.get("/start/force");
+      window.location.reload();
+    });
+  </script>
 </body>
 
 </html>

@@ -9,7 +9,7 @@
 - `sudo mount /dev/mmcblk0p1 /boot` (mmcblk0p1 = camera)
 - /boot/firmware/config.txt -> append line `start_x=1`
 - `sudo reboot 0`
-- `sudo raspi-config` -> intercaces -> enable camera
+- `sudo raspi-config` -> interfaces -> enable camera
 - `sudo apt install pip`
 - `sudo reboot 0`
 - `python3 -m pip install poetry --user`

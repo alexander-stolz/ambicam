@@ -236,6 +236,7 @@ class ColorGrabber(threading.Thread):
                 self.server.update_colors(colors)
         finally:
             self.running = False
+            self.server.update_colors([[0, 0, 0]] * len(self.indices))
             self.camera.disconnect()
             self.server.stop()
             ColorGrabber._instance = None
