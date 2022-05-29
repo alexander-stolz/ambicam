@@ -278,22 +278,21 @@ class RainbowGrabber(ColorGrabber):
         # floats are alowed here to ensure smooth transitions. server.send_colors()
         # has to deal with int conversion.
         def __init__(self, b=0, g=0, r=0):
-            self.values = array([b, g, r], dtype=float)
-
-        def __str__(self):
-            return f'{self.values}'
+            self.values = [b, g, r]
 
         def __add__(self, other):
-            ret = self.values + other.values
-            if ret.max() > 255:
-                ret = ret / ret.max() * 255
+            ret = tuple(self.values[i] + other.values[i] for i in range(3))
+            _max = max(ret)
+            if _max > 255:
+                ret = tuple(ret[i] / _max * 255 for i in range(3))
             return RainbowGrabber.Color(*ret)
 
         def __mul__(self, val):
-            return RainbowGrabber.Color(*(self.values * val))
+            ret = tuple(self.values[i] * val for i in range(3))
+            return RainbowGrabber.Color(*ret)
 
         def __gt__(self, other):
-            return self.values.max() > other.values.max()
+            return max(self.values) > max(other.values)
 
         def __getitem__(self, i):
             return self.values[i]
@@ -306,7 +305,7 @@ class RainbowGrabber(ColorGrabber):
 
         @property
         def max(self):
-            return self.values.max()
+            return max(self.values)
 
     class Pixels:
         def __init__(self, num):
@@ -369,9 +368,12 @@ class RainbowGrabber(ColorGrabber):
         def indices(self):
             return self.pixels.keys
 
+        # @profile
         def blur(self):
-            old_pixels = deepcopy(self.pixels)
-            for pos, col in old_pixels.items():
+            old_pixels = tuple(
+                (i, RainbowGrabber.Color(*self.pixels[i].values)) for i in self.indices
+            )
+            for pos, col in old_pixels:
                 for d_pos in range(self._default_blur_width):
                     self.pixels[pos - d_pos - 1] = (
                         self.pixels[pos - d_pos - 1] * (1 - self._default_blur_factor)
