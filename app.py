@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from typing import Optional
 import uvicorn
 import os
 from time import sleep
@@ -14,7 +15,7 @@ from fastapi.responses import (
 )
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from modules.colorgrabber import ColorGrabber
+from modules.colorgrabber import ColorGrabber, RainbowGrabber, CameraGrabber
 from modules.utils import config, save_config
 
 log = logging.getLogger(__name__)
@@ -29,6 +30,18 @@ app.mount('/static', StaticFiles(directory='static'), name='static')
 templates = Jinja2Templates(directory="templates")
 
 
+def get_instance(obj: ColorGrabber = None) -> Optional[ColorGrabber]:
+    if obj is None and ColorGrabber._instance is not None:
+        return ColorGrabber._instance
+    elif ColorGrabber._instance is not None and not isinstance(
+        ColorGrabber._instance, obj
+    ):
+        ColorGrabber._instance.stop()
+        while ColorGrabber._instance is not None:
+            sleep(0.5)
+    return obj and obj()
+
+
 @app.get('/remote')
 def remote(request: Request):
     return templates.TemplateResponse(
@@ -40,9 +53,20 @@ def remote(request: Request):
     )
 
 
+@app.get('/preview')
+def preview(request: Request):
+    return templates.TemplateResponse(
+        'preview.html',
+        {
+            'request': request,
+            'config': config,
+        },
+    )
+
+
 @app.get('/', response_class=HTMLResponse)
 def index(request: Request):
-    color_grabber = ColorGrabber()
+    color_grabber = get_instance(CameraGrabber)
     if color_grabber.running:
         color_grabber.save_frame('static/frame.jpg')
         # return render_template('index.html', config=config)
@@ -76,6 +100,7 @@ def colors(
 
 @app.get('/colors/{cmd}')
 def colors_cmd(cmd: str):
+    color_grabber = get_instance(CameraGrabber)
     new_colors = config.colors
     if cmd == 'red_up':
         new_colors['red'] += 0.05
@@ -95,10 +120,10 @@ def colors_cmd(cmd: str):
     if cmd == 'brightness_down':
         new_colors['brightness'] -= 0.05
         new_colors['brightness'] = max(min(new_colors['brightness'], 1), 0)
-    if cmd == 'auto_colors' and ColorGrabber().wb_correction is not None:
-        new_colors['red'] *= ColorGrabber().wb_correction[2]
-        new_colors['green'] *= ColorGrabber().wb_correction[1]
-        new_colors['blue'] *= ColorGrabber().wb_correction[0]
+    if cmd == 'auto_colors' and color_grabber.wb_correction is not None:
+        new_colors['red'] *= color_grabber.wb_correction[2]
+        new_colors['green'] *= color_grabber.wb_correction[1]
+        new_colors['blue'] *= color_grabber.wb_correction[0]
     return colors(
         new_colors['red'],
         new_colors['green'],
@@ -109,7 +134,7 @@ def colors_cmd(cmd: str):
 
 @app.get('/stream')
 async def stream():
-    color_grabber = ColorGrabber()
+    color_grabber = get_instance(CameraGrabber)
     return StreamingResponse(
         color_grabber.stream(), media_type='multipart/x-mixed-replace; boundary=frame'
     )
@@ -117,22 +142,30 @@ async def stream():
 
 @app.get('/start')
 def start():
-    color_grabber = ColorGrabber()
-    return {'running': color_grabber.running}
+    get_instance(CameraGrabber)
+    return {'running': ColorGrabber.running}
 
 
-@app.get('/start/force')
-def force_start():
-    ColorGrabber().stop()
-    ColorGrabber._instance = None
-    sleep(0.5)
-    color_grabber = ColorGrabber()
-    return {'running': color_grabber.running}
+# @app.get('/start/force')
+# def force_start():
+#     ColorGrabber().stop()
+#     ColorGrabber._instance = None
+#     sleep(0.5)
+#     color_grabber = CameraGrabber()
+#     return {'running': color_grabber.running}
+
+
+@app.get('/start/rainbow')
+def rainbow_start():
+    get_instance(RainbowGrabber)
+    return {'running': ColorGrabber.running}
 
 
 @app.get('/stop')
 def stop():
-    ColorGrabber().stop()
+    instance = get_instance()
+    if instance:
+        instance.stop()
     sleep(0.5)
     return {'running': ColorGrabber.running}
 
@@ -145,6 +178,13 @@ def get_config():
 @app.get('/logs')
 def get_logs():
     return open('log.log', 'r').readlines()
+
+
+@app.get('/logs/html', response_class=HTMLResponse)
+def get_logs_html():
+    with open('log.log', 'r') as f:
+        logs = f.readlines()
+    return '<br>'.join(l.rstrip('\n') for l in logs)
 
 
 @app.post('/config')
@@ -200,46 +240,45 @@ def saturation_down():
 
 @app.get('/dt')
 def dt():
-    return {'dt': ColorGrabber().server.dt}
+    return {'dt': CameraGrabber().server.dt}
 
 
 @app.get('/wb')
 def wb():
-    if ColorGrabber().wb_correction is None:
+    color_grabber = get_instance(CameraGrabber)
+    if color_grabber.wb_correction is None:
         return 'automatic white balance correction is disabled'
     return dict(
-        red=float(ColorGrabber().wb_correction[0]),
-        green=float(ColorGrabber().wb_correction[1]),
-        blue=float(ColorGrabber().wb_correction[2]),
+        red=float(color_grabber.wb_correction[0]),
+        green=float(color_grabber.wb_correction[1]),
+        blue=float(color_grabber.wb_correction[2]),
     )
 
 
 @app.get('/wb/queue/{val}')
 def set_wb_frames(val: int):
+    color_grabber = get_instance(CameraGrabber)
     config.colors['queueSize'] = val
     save_config()
-    ColorGrabber().last_wb_corrections = deque(
-        maxlen=config.colors.get('queueSize', 30)
-    )
-    ColorGrabber().last_wb_weights = deque(maxlen=config.colors.get('queueSize', 30))
+    color_grabber.last_wb_corrections = deque(maxlen=config.colors.get('queueSize', 30))
+    color_grabber.last_wb_weights = deque(maxlen=config.colors.get('queueSize', 30))
     return RedirectResponse('/')
 
 
 @app.get('/wb/off')
 def wb():
-    ColorGrabber().auto_wb = False
+    get_instance(CameraGrabber).auto_wb = False
     return RedirectResponse('/')
 
 
 @app.get('/wb/on')
 def wb():
-    ColorGrabber().auto_wb = True
+    get_instance(CameraGrabber).auto_wb = True
     return RedirectResponse('/')
 
 
 @app.get('/window')
 def window(cmd: str):
-    print(cmd)
     if cmd == 'll':
         config.window['left'] -= 5
     if cmd == 'lr':
@@ -257,13 +296,12 @@ def window(cmd: str):
     if cmd == 'uu':
         config.window['bottom'] += 5
     save_config()
-    ColorGrabber().indices = None
+    get_instance(CameraGrabber).indices = None
     return RedirectResponse('/')
 
 
 @app.get('/checkwindow')
 def checkwindow(cmd: str):
-    print(cmd)
     if cmd == 'll':
         config.checkWindow['left'] -= 5
     if cmd == 'lr':
@@ -281,15 +319,15 @@ def checkwindow(cmd: str):
     if cmd == 'uu':
         config.checkWindow['bottom'] += 5
     save_config()
-    ColorGrabber()._check_indices = None
+    get_instance(CameraGrabber)._check_indices = None
     return RedirectResponse('/')
 
 
 def serve():
     uvicorn.run(
         app,
-        host=config.connection.get('host', '0.0.0.0'),
-        port=config.connection.get('port', 5000),
+        host=config.ambicam.get('host', '0.0.0.0'),
+        port=config.ambicam.get('port', 5000),
         log_level='info',
     )
 

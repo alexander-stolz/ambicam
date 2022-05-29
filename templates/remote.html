@@ -112,10 +112,14 @@
       <a id="smoothing_up" class="btn btn-secondary" href="#">+</a>
     </div>
     <div class="btn-group" role="group">
-      <a id="start" class="btn btn-primary" href="#">start</a>
+      <a id="preview" class="btn btn-secondary" href="/preview">preview</a>
+      <a id="log" class="btn btn-secondary" href="/logs/html">logs</a>
+    </div>
+    <div class="btn-group" role="group">
+      <a id="start" class="btn btn-primary" href="#">&#127909;</a>
+      <a id="rainbow" class="btn btn-primary" href="#"> &#127752;</a>
       <a id="stop" class="btn btn-primary" href="#">stop</a>
-      <a id="force" class="btn btn-primary" href="#">force</a>
-      <a id="log" class="btn btn-secondary" href="/logs">logs</a>
+      <!-- <a id="force" class="btn btn-primary" href="#">force</a> -->
     </div>
   </div>
 
@@ -159,15 +163,19 @@
     });
     $("#start").on("click", function () {
       $.get("/start");
-      window.location.reload();
+      // window.location.reload();
     });
     $("#stop").on("click", function () {
       $.get("/stop");
-      window.location.reload();
+      // window.location.reload();
     });
     $("#force").on("click", function () {
       $.get("/start/force");
-      window.location.reload();
+      // window.location.reload();
+    });
+    $("#rainbow").on("click", function () {
+      $.get("/start/rainbow");
+      // window.location.reload();
     });
   </script>
 </body>

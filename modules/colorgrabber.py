@@ -1,12 +1,19 @@
+from copy import copy, deepcopy
 import logging
+from math import sqrt
 import os
+from random import gauss, randint, randrange
+import random
+from typing import Iterable, List
 import cv2
 from time import sleep
-from collections import deque
+from collections import defaultdict, deque
 import threading
-from numpy import array, linspace, average
+from numpy import apply_along_axis, array, convolve, linspace, average, zeros
 from modules.servers import BridgeConnection, PrismatikConnection, DummyConnection
 from modules.utils import config
+from abc import ABC, abstractmethod
+from random import randint
 
 if config.get('cameraInterface', 'cv2') == 'picamera':
     from modules.camera import PiCamera as Camera
@@ -17,43 +24,47 @@ else:
 log = logging.getLogger(__name__)
 
 
-class ColorGrabber(threading.Thread):
-    _frame = None
+class BGRColor:
+    # just for type declaration
+    bgr: Iterable = (0, 0, 0)
+
+
+class ColorGrabber(ABC, threading.Thread):
     _instance = None
-    _indices = None
-    _check_indices = None
-    _last_colors = None
     running = False
-    auto_wb = False
-    wb_queue_size = 30
-    wb_correction = array([1, 1, 1])
-    last_wb_corrections = deque(maxlen=150)
-    last_wb_weights = deque(maxlen=150)
+
+    @abstractmethod
+    def initialize(self):
+        pass
+
+    @abstractmethod
+    def get_colors(self) -> Iterable[BGRColor]:
+        pass
+
+    @abstractmethod
+    def teardown(self):
+        pass
+
+    def stop(self):
+        self.running = False
+        sleep(0.5)
+        self.teardown()
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            print("Creating new instance")
-            cls._instance = super(ColorGrabber, cls).__new__(cls, *args, **kwargs)
-            super().__init__(cls._instance)
-            cls._instance.connect_to_server()
-            cls._instance.connect_to_camera()
-            cls._instance.last_wb_corrections = deque(
-                maxlen=config.colors.get('queueSize', 150)
+        if ColorGrabber._instance is None:
+            log.debug("Creating new instance")
+            ColorGrabber._instance = super(ColorGrabber, cls).__new__(
+                cls, *args, **kwargs
             )
-            cls._instance.last_wb_weights = deque(
-                maxlen=config.colors.get('queueSize', 150)
-            )
-            cls._instance.start()
-            for _ in range(10):
-                print(_)
-                if cls._instance._frame is None:
-                    sleep(0.1)
-                else:
-                    break
-        return cls._instance
+            super().__init__(ColorGrabber._instance)
+            ColorGrabber._instance.connect_to_server()
+            ColorGrabber._instance.initialize()
+            ColorGrabber._instance.start()
+            sleep(2)
+        return ColorGrabber._instance
 
     def connect_to_server(self):
-        print("connect server")
+        log.debug("connect server")
         server_type = config.get('server', 'dummy')
         if server_type not in config and server_type != 'dummy':
             raise ValueError(f'Unknown server type: {server_type}')
@@ -65,12 +76,38 @@ class ColorGrabber(threading.Thread):
             self.server = DummyConnection()
         self.server.connect(**config.get(server_type, {}))
 
-    def connect_to_camera(self):
-        print("connect camera")
+    def run(self):
+        self.running = True
+        try:
+            while self.running:
+                colors = self.get_colors()
+                self.server.update_colors(colors)
+        finally:
+            self.running = False
+            self.server.stop()
+            ColorGrabber._instance = None
+            log.debug('ColorGrabber stopped')
+
+
+class CameraGrabber(ColorGrabber):
+    _frame = None
+    _indices = None
+    _check_indices = None
+    _last_colors = None
+    auto_wb = False
+    wb_queue_size = 30
+    wb_correction = array([1, 1, 1])
+    last_wb_corrections = deque(maxlen=150)
+    last_wb_weights = deque(maxlen=150)
+
+    def initialize(self):
+        log.debug('connect camera')
         for property, value in config.get('v4120', {}).items():
             os.system(f'v4l2-ctl --set-ctrl={property}={value}')
         self.camera = Camera()
         self.camera.connect()
+        self.last_wb_corrections = deque(maxlen=config.colors.get('queueSize', 150))
+        self.last_wb_weights = deque(maxlen=config.colors.get('queueSize', 150))
 
     @property
     def frame(self):
@@ -206,8 +243,13 @@ class ColorGrabber(threading.Thread):
                 )
         return self.wb_correction
 
-    def get_colors(self, frame):
+    def get_colors(self) -> Iterable[BGRColor]:
+        frame = self.camera.get_frame()
+
+        if config.blur:
+            frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
         colors = array([frame[y][x] for y, x in self.indices])
+
         if self.auto_wb:
             wb_correction_ = self.get_color_correction(frame)
             if config.auto_wb:
@@ -224,24 +266,66 @@ class ColorGrabber(threading.Thread):
         self.frame = frame
         return colors
 
-    def run(self):
-        self.running = True
-        try:
-            while self.running:
-                frame = self.camera.get_frame()
-                if config.blur:
-                    frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
-                colors = self.get_colors(frame)
-                # color format: BGR
-                self.server.update_colors(colors)
-        finally:
-            self.running = False
-            self.server.update_colors([[0, 0, 0]] * len(self.indices))
-            self.camera.disconnect()
-            self.server.stop()
-            ColorGrabber._instance = None
-            self._frame = None
-            self._indices = None
+    def teardown(self):
+        self.camera.disconnect()
+        self._frame = None
+        self._indices = None
 
-    def stop(self):
-        self.running = False
+
+class RainbowGrabber(ColorGrabber):
+    _default_number_dots = 10
+    _default_dot_width = 60
+    # _default_blur_factor = 0.8
+
+    def initialize(self):
+        self.dots = []
+        self.num_leds = sum(_['leds'] for _ in config.leds)
+        for _ in range(self._default_number_dots):
+            self.spawn_new_dot()
+        self.blur_and_fade_dots()
+        self.res = sum(self.dots) / len(self.dots) / 10
+
+    def spawn_new_dot(self):
+        dot = zeros((self.num_leds, 3), dtype=int)
+        _color = array([randint(0, 255), randint(0, 255), randint(0, 255)]) * 10
+        _pos = randint(0, self.num_leds)
+        _width = gauss(self._default_dot_width, sqrt(self._default_dot_width))
+        _min_idx = max(0, _pos - int(_width / 2))
+        _max_idx = min(self.num_leds, _pos + int(_width / 2))
+        for i in range(_min_idx, _max_idx):
+            dot[i] = _color
+        self.dots.append(dot)
+
+    def remove_dead_dots(self):
+        kill = []
+        for i, dot in enumerate(self.dots):
+            if dot.max() < 100:
+                kill.append(i)
+        for i in reversed(kill):
+            del self.dots[i]
+
+    def blur_and_fade_dots(self):
+        # kernel = array([0.1, 0.79, 0.1])
+        kernel = array([0.44, 0.24, 0.1, 0.24, 0.44])
+        kernel /= sum(kernel) * 1.005
+        for i, dot in enumerate(self.dots):
+            self.dots[i] = apply_along_axis(
+                lambda x: convolve(x, kernel, mode='same'), 0, dot
+            )
+
+    def get_colors(self):
+        if len(self.dots) < self._default_number_dots:
+            self.spawn_new_dot()
+
+        self.blur_and_fade_dots()
+        self.remove_dead_dots()
+
+        res = 0.1 * sum(self.dots) / len(self.dots) + 0.9 * self.res
+        self.res = res
+
+        sleep(0.03)
+        return res / 10
+
+    def teardown(self):
+        # nothing to do here. let the GC do its job.
+        pass

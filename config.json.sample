@@ -1,4 +1,17 @@
 {
+    "ambicam": {
+        "host": "0.0.0.0",
+        "port": 5000
+    },
+    "server": "bridge",
+    "bridge": {
+        "host": "192.168.1.117",
+        "port": 7000
+    },
+    "prismatik": {
+        "host": "192.168.1.108",
+        "port": 3636
+    },
     "resolution": {
         "width": 640,
         "height": 480
@@ -8,18 +21,18 @@
         "white_balance_auto_preset": 0,
         "red_balance": 1430,
         "blue_balance": 1400,
-        "saturation": -10
+        "saturation": 30
     },
     "window": {
         "left": 135,
-        "top": 205,
-        "right": 380,
-        "bottom": 300
+        "top": 195,
+        "right": 375,
+        "bottom": 315
     },
     "checkWindow": {
-        "top": 170,
+        "top": 175,
         "left": 115,
-        "bottom": 335,
+        "bottom": 340,
         "right": 395
     },
     "leds": [
@@ -35,21 +48,21 @@
             "leds": 54,
             "from": 1,
             "to": 0,
-            "check": true
+            "check": false
         },
         {
             "side": "top",
             "leds": 96,
             "from": 1,
             "to": 0,
-            "check": true
+            "check": false
         },
         {
             "side": "left",
             "leds": 54,
             "from": 0,
             "to": 1,
-            "check": true
+            "check": false
         },
         {
             "side": "bottom",
@@ -60,23 +73,15 @@
         }
     ],
     "blur": 0,
-    "telnet": {
-        "host": "192.168.1.108",
-        "port": 3636
-    },
-    "connection": {
-        "host": "0.0.0.0",
-        "port": 5000
-    },
     "fps": {
         "capture": 30,
         "interpolation": 0
     },
     "colors": {
-        "red": 0.57,
-        "green": 0.62,
-        "blue": 0.67,
-        "brightness": 1.0
+        "red": 1.0,
+        "green": 0.81994459833795,
+        "blue": 0.6759002770083102,
+        "brightness": 0.1
     },
     "auto_wb": false,
     "smoothing": 0.95
