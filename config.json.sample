@@ -48,21 +48,21 @@
             "leds": 54,
             "from": 1,
             "to": 0,
-            "check": true
+            "check": false
         },
         {
             "side": "top",
             "leds": 96,
             "from": 1,
             "to": 0,
-            "check": true
+            "check": false
         },
         {
             "side": "left",
             "leds": 54,
             "from": 0,
             "to": 1,
-            "check": true
+            "check": false
         },
         {
             "side": "bottom",

@@ -39,6 +39,16 @@ def remote(request: Request):
         },
     )
 
+@app.get('/preview')
+def preview(request: Request):
+    return templates.TemplateResponse(
+        'preview.html',
+        {
+            'request': request,
+            'config': config,
+        },
+    )
+
 
 @app.get('/', response_class=HTMLResponse)
 def index(request: Request):
@@ -153,6 +163,13 @@ def get_config():
 @app.get('/logs')
 def get_logs():
     return open('log.log', 'r').readlines()
+
+
+@app.get('/logs/html', response_class=HTMLResponse)
+def get_logs_html():
+    with open('log.log', 'r') as f:
+        logs = f.readlines()
+    return '<br>'.join(l.rstrip('\n') for l in logs)
 
 
 @app.post('/config')
