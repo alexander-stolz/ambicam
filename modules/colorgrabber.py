@@ -2,13 +2,14 @@ from copy import copy, deepcopy
 import logging
 from math import sqrt
 import os
-from random import gauss, randint
+from random import gauss, randint, randrange
+import random
 from typing import Iterable, List
 import cv2
 from time import sleep
 from collections import defaultdict, deque
 import threading
-from numpy import array, linspace, average, zeros
+from numpy import apply_along_axis, array, convolve, linspace, average, zeros
 from modules.servers import BridgeConnection, PrismatikConnection, DummyConnection
 from modules.utils import config
 from abc import ABC, abstractmethod
@@ -273,155 +274,57 @@ class CameraGrabber(ColorGrabber):
 
 class RainbowGrabber(ColorGrabber):
     _default_number_dots = 10
-
-    class Color:
-        # floats are alowed here to ensure smooth transitions. server.send_colors()
-        # has to deal with int conversion.
-        def __init__(self, b=0, g=0, r=0):
-            self.values = [b, g, r]
-
-        def __add__(self, other):
-            ret = tuple(self.values[i] + other.values[i] for i in range(3))
-            _max = max(ret)
-            if _max > 255:
-                ret = tuple(ret[i] / _max * 255 for i in range(3))
-            return RainbowGrabber.Color(*ret)
-
-        def __mul__(self, val):
-            ret = tuple(self.values[i] * val for i in range(3))
-            return RainbowGrabber.Color(*ret)
-
-        def __gt__(self, other):
-            return max(self.values) > max(other.values)
-
-        def __getitem__(self, i):
-            return self.values[i]
-
-        def __str__(self):
-            return str(self.values)
-
-        def __repr__(self):
-            return str(self.values)
-
-        @property
-        def max(self):
-            return max(self.values)
-
-    class Pixels:
-        def __init__(self, num):
-            self.colors = defaultdict(RainbowGrabber.Color)
-            self.num = num
-
-        def led_pos(self, pos):
-            return pos % self.num
-
-        def __setitem__(self, i, v):
-            self.colors[self.led_pos(i)] = v
-
-        def __getitem__(self, i):
-            return self.colors[self.led_pos(i)]
-
-        def __mul__(self, v):
-            for i in self.colors:
-                self.colors[i] *= v
-            return self
-
-        def __str__(self):
-            return str(self.colors.items())
-
-        def __repr__(self):
-            return str(self.colors.items())
-
-        def items(self):
-            return self.colors.items()
-
-        def values(self):
-            return tuple(self.colors[i] for i in range(self.num))
-
-        @property
-        def max(self):
-            return max(self.colors.values()).max
-
-        @property
-        def keys(self):
-            return self.colors.keys()
-
-    class Dot:
-        _default_dot_width = 60
-        _default_blur_width = 1
-        _default_blur_factor = 0.8
-        _default_fade_factor = 0.995
-
-        def __init__(self, pos, color):
-            num_leds = sum(_['leds'] for _ in config.leds)
-            self.pixels = RainbowGrabber.Pixels(num_leds)
-
-            width = gauss(self._default_dot_width, sqrt(self._default_dot_width))
-            for i in range(pos - int(width / 2), pos + int(width / 2)):
-                self.pixels[i] = color
-            self.blur()
-
-        def __getitem__(self, i):
-            return self.pixels[i]
-
-        @property
-        def indices(self):
-            return self.pixels.keys
-
-        # @profile
-        def blur(self):
-            old_pixels = tuple(
-                (i, RainbowGrabber.Color(*self.pixels[i].values)) for i in self.indices
-            )
-            for pos, col in old_pixels:
-                for d_pos in range(self._default_blur_width):
-                    self.pixels[pos - d_pos - 1] = (
-                        self.pixels[pos - d_pos - 1] * (1 - self._default_blur_factor)
-                        + col * self._default_blur_factor
-                    )
-                    self.pixels[pos + d_pos + 1] = (
-                        self.pixels[pos + d_pos + 1] * (1 - self._default_blur_factor)
-                        + col * self._default_blur_factor
-                    )
-
-        def fade(self):
-            self.pixels *= self._default_fade_factor
-
-        @property
-        def dead(self):
-            return self.pixels.max < 10
+    _default_dot_width = 60
+    # _default_blur_factor = 0.8
 
     def initialize(self):
         self.dots = []
         self.num_leds = sum(_['leds'] for _ in config.leds)
         for _ in range(self._default_number_dots):
             self.spawn_new_dot()
+        self.blur_and_fade_dots()
+        self.res = sum(self.dots) / len(self.dots) / 10
 
     def spawn_new_dot(self):
+        dot = zeros((self.num_leds, 3), dtype=int)
+        _color = array([randint(0, 255), randint(0, 255), randint(0, 255)]) * 10
         _pos = randint(0, self.num_leds)
-        _color = RainbowGrabber.Color(randint(0, 255), randint(0, 255), randint(0, 255))
-        self.dots.append(self.Dot(_pos, _color))
-        print(len(self.dots))
+        _width = gauss(self._default_dot_width, sqrt(self._default_dot_width))
+        _min_idx = max(0, _pos - int(_width / 2))
+        _max_idx = min(self.num_leds, _pos + int(_width / 2))
+        for i in range(_min_idx, _max_idx):
+            dot[i] = _color
+        self.dots.append(dot)
 
     def remove_dead_dots(self):
-        for dot in self.dots[:]:
-            if dot.dead:
-                self.dots.remove(dot)
+        kill = []
+        for i, dot in enumerate(self.dots):
+            if dot.max() < 100:
+                kill.append(i)
+        for i in reversed(kill):
+            del self.dots[i]
+
+    def blur_and_fade_dots(self):
+        # kernel = array([0.1, 0.79, 0.1])
+        kernel = array([0.44, 0.24, 0.1, 0.24, 0.44])
+        kernel /= sum(kernel) * 1.005
+        for i, dot in enumerate(self.dots):
+            self.dots[i] = apply_along_axis(
+                lambda x: convolve(x, kernel, mode='same'), 0, dot
+            )
 
     def get_colors(self):
         if len(self.dots) < self._default_number_dots:
             self.spawn_new_dot()
-        for dot in self.dots:
-            dot.blur()
-            dot.fade()
+
+        self.blur_and_fade_dots()
         self.remove_dead_dots()
 
-        res = RainbowGrabber.Pixels(self.num_leds)
-        for dot in self.dots:
-            for i in dot.indices:
-                res[i] += dot[i]
+        res = 0.1 * sum(self.dots) / len(self.dots) + 0.9 * self.res
+        self.res = res
+
         sleep(0.03)
-        return res.values()
+        return res / 10
 
     def teardown(self):
         # nothing to do here. let the GC do its job.

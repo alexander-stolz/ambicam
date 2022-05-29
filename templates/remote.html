@@ -115,7 +115,8 @@
       <a id="start" class="btn btn-primary" href="#">start</a>
       <a id="stop" class="btn btn-primary" href="#">stop</a>
       <a id="force" class="btn btn-primary" href="#">force</a>
-      <a id="log" class="btn btn-secondary" href="/logs">logs</a>
+      <a id="rainbow" class="btn btn-primary" href="#"> &#127752;</a>
+      <!-- <a id="log" class="btn btn-secondary" href="/logs">logs</a> -->
     </div>
   </div>
 
@@ -167,6 +168,10 @@
     });
     $("#force").on("click", function () {
       $.get("/start/force");
+      // window.location.reload();
+    });
+    $("#rainbow").on("click", function () {
+      $.get("/start/rainbow");
       // window.location.reload();
     });
   </script>

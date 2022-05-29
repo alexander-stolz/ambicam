@@ -14,7 +14,7 @@ from fastapi.responses import (
 )
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from modules.colorgrabber import ColorGrabber, RainbowGrabber as CameraGrabber
+from modules.colorgrabber import ColorGrabber, RainbowGrabber, CameraGrabber
 from modules.utils import config, save_config
 
 log = logging.getLogger(__name__)
@@ -127,6 +127,14 @@ def force_start():
     ColorGrabber._instance = None
     sleep(0.5)
     color_grabber = CameraGrabber()
+    return {'running': color_grabber.running}
+
+
+@app.get('/start/rainbow')
+def rainbow_start():
+    CameraGrabber().stop()
+    sleep(0.5)
+    color_grabber = RainbowGrabber()
     return {'running': color_grabber.running}
 
 
