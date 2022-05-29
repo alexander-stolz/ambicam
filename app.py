@@ -14,7 +14,7 @@ from fastapi.responses import (
 )
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from modules.colorgrabber import ColorGrabber
+from modules.colorgrabber import ColorGrabber, RainbowGrabber as CameraGrabber
 from modules.utils import config, save_config
 
 log = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ def remote(request: Request):
 
 @app.get('/', response_class=HTMLResponse)
 def index(request: Request):
-    color_grabber = ColorGrabber()
+    color_grabber = CameraGrabber()
     if color_grabber.running:
         color_grabber.save_frame('static/frame.jpg')
         # return render_template('index.html', config=config)
@@ -95,10 +95,10 @@ def colors_cmd(cmd: str):
     if cmd == 'brightness_down':
         new_colors['brightness'] -= 0.05
         new_colors['brightness'] = max(min(new_colors['brightness'], 1), 0)
-    if cmd == 'auto_colors' and ColorGrabber().wb_correction is not None:
-        new_colors['red'] *= ColorGrabber().wb_correction[2]
-        new_colors['green'] *= ColorGrabber().wb_correction[1]
-        new_colors['blue'] *= ColorGrabber().wb_correction[0]
+    if cmd == 'auto_colors' and CameraGrabber().wb_correction is not None:
+        new_colors['red'] *= CameraGrabber().wb_correction[2]
+        new_colors['green'] *= CameraGrabber().wb_correction[1]
+        new_colors['blue'] *= CameraGrabber().wb_correction[0]
     return colors(
         new_colors['red'],
         new_colors['green'],
@@ -109,7 +109,7 @@ def colors_cmd(cmd: str):
 
 @app.get('/stream')
 async def stream():
-    color_grabber = ColorGrabber()
+    color_grabber = CameraGrabber()
     return StreamingResponse(
         color_grabber.stream(), media_type='multipart/x-mixed-replace; boundary=frame'
     )
@@ -117,7 +117,7 @@ async def stream():
 
 @app.get('/start')
 def start():
-    color_grabber = ColorGrabber()
+    color_grabber = CameraGrabber()
     return {'running': color_grabber.running}
 
 
@@ -126,15 +126,15 @@ def force_start():
     ColorGrabber().stop()
     ColorGrabber._instance = None
     sleep(0.5)
-    color_grabber = ColorGrabber()
+    color_grabber = CameraGrabber()
     return {'running': color_grabber.running}
 
 
 @app.get('/stop')
 def stop():
-    ColorGrabber().stop()
+    CameraGrabber().stop()
     sleep(0.5)
-    return {'running': ColorGrabber.running}
+    return {'running': CameraGrabber.running}
 
 
 @app.get('/config')
@@ -200,17 +200,17 @@ def saturation_down():
 
 @app.get('/dt')
 def dt():
-    return {'dt': ColorGrabber().server.dt}
+    return {'dt': CameraGrabber().server.dt}
 
 
 @app.get('/wb')
 def wb():
-    if ColorGrabber().wb_correction is None:
+    if CameraGrabber().wb_correction is None:
         return 'automatic white balance correction is disabled'
     return dict(
-        red=float(ColorGrabber().wb_correction[0]),
-        green=float(ColorGrabber().wb_correction[1]),
-        blue=float(ColorGrabber().wb_correction[2]),
+        red=float(CameraGrabber().wb_correction[0]),
+        green=float(CameraGrabber().wb_correction[1]),
+        blue=float(CameraGrabber().wb_correction[2]),
     )
 
 
@@ -218,28 +218,27 @@ def wb():
 def set_wb_frames(val: int):
     config.colors['queueSize'] = val
     save_config()
-    ColorGrabber().last_wb_corrections = deque(
+    CameraGrabber().last_wb_corrections = deque(
         maxlen=config.colors.get('queueSize', 30)
     )
-    ColorGrabber().last_wb_weights = deque(maxlen=config.colors.get('queueSize', 30))
+    CameraGrabber().last_wb_weights = deque(maxlen=config.colors.get('queueSize', 30))
     return RedirectResponse('/')
 
 
 @app.get('/wb/off')
 def wb():
-    ColorGrabber().auto_wb = False
+    CameraGrabber().auto_wb = False
     return RedirectResponse('/')
 
 
 @app.get('/wb/on')
 def wb():
-    ColorGrabber().auto_wb = True
+    CameraGrabber().auto_wb = True
     return RedirectResponse('/')
 
 
 @app.get('/window')
 def window(cmd: str):
-    print(cmd)
     if cmd == 'll':
         config.window['left'] -= 5
     if cmd == 'lr':
@@ -257,13 +256,12 @@ def window(cmd: str):
     if cmd == 'uu':
         config.window['bottom'] += 5
     save_config()
-    ColorGrabber().indices = None
+    CameraGrabber().indices = None
     return RedirectResponse('/')
 
 
 @app.get('/checkwindow')
 def checkwindow(cmd: str):
-    print(cmd)
     if cmd == 'll':
         config.checkWindow['left'] -= 5
     if cmd == 'lr':
@@ -281,15 +279,15 @@ def checkwindow(cmd: str):
     if cmd == 'uu':
         config.checkWindow['bottom'] += 5
     save_config()
-    ColorGrabber()._check_indices = None
+    CameraGrabber()._check_indices = None
     return RedirectResponse('/')
 
 
 def serve():
     uvicorn.run(
         app,
-        host=config.connection.get('host', '0.0.0.0'),
-        port=config.connection.get('port', 5000),
+        host=config.ambicam.get('host', '0.0.0.0'),
+        port=config.ambicam.get('port', 5000),
         log_level='info',
     )
 

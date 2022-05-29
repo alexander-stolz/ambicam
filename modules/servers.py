@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from hashlib import new
 import logging
 from time import sleep, perf_counter as time
 import threading
@@ -46,6 +47,7 @@ class Connection(ABC, threading.Thread):
                 continue
             if not smoothing:
                 self.send_colors(self.new_colors)
+                last_colors = self.new_colors
                 self.new_colors = None
                 continue
             _t = time()
@@ -71,6 +73,7 @@ class Connection(ABC, threading.Thread):
                     sleep(_sleep)
                 else:
                     log.warning('too much smoothing')
+        self.send_colors([[0, 0, 0]] * sum(_['leds'] for _ in config.leds))
         self.disconnect()
 
     def stop(self):
@@ -117,7 +120,13 @@ class BridgeConnection(Connection):
         hi = num >> 8
         lo = num & 0xFF
         checksum = hi ^ lo ^ 0x55
-        header = b'Ada' + bytes([hi, lo, checksum])
+        try:
+            header = b'Ada' + bytes([hi, lo, checksum])
+        except ValueError:
+            log.error(
+                'ValueError: num: %s hi: %s lo: %s checksum: %s', num, hi, lo, checksum
+            )
+            return 0
         payload = bytes(
             int(item) for color in colors for item in (color[1], color[2], color[0])
         )
