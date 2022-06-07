@@ -12,6 +12,9 @@
         "host": "192.168.1.108",
         "port": 3636
     },
+    "tv": {
+        "host": "192.138.1.113"
+    },
     "resolution": {
         "width": 640,
         "height": 480
@@ -72,7 +75,6 @@
             "check": false
         }
     ],
-    "blur": 0,
     "fps": {
         "capture": 30,
         "interpolation": 0
@@ -83,6 +85,5 @@
         "blue": 0.6759002770083102,
         "brightness": 0.1
     },
-    "auto_wb": false,
     "smoothing": 0.95
 }

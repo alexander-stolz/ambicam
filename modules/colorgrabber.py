@@ -1,17 +1,15 @@
-from copy import copy, deepcopy
 import logging
 from math import sqrt
 import os
-from random import gauss, randint, randrange
-import random
-from typing import Iterable, List
+from random import gauss, randint
+from typing import Iterable
 import cv2
 from time import sleep
-from collections import defaultdict, deque
+from collections import deque
 import threading
 from numpy import apply_along_axis, array, convolve, linspace, average, zeros
 from modules.servers import BridgeConnection, PrismatikConnection, DummyConnection
-from modules.utils import config
+from modules.utils import config, TV
 from abc import ABC, abstractmethod
 from random import randint
 
@@ -99,6 +97,7 @@ class CameraGrabber(ColorGrabber):
     wb_correction = array([1, 1, 1])
     last_wb_corrections = deque(maxlen=150)
     last_wb_weights = deque(maxlen=150)
+    tv_was_on = False
 
     def initialize(self):
         log.debug('connect camera')
@@ -106,6 +105,7 @@ class CameraGrabber(ColorGrabber):
             os.system(f'v4l2-ctl --set-ctrl={property}={value}')
         self.camera = Camera()
         self.camera.connect()
+        self.tv = TV(host=config.tv.host, dt=1)
         self.last_wb_corrections = deque(maxlen=config.colors.get('queueSize', 150))
         self.last_wb_weights = deque(maxlen=config.colors.get('queueSize', 150))
 
@@ -216,44 +216,21 @@ class CameraGrabber(ColorGrabber):
     def indices(self, indices):
         self._indices = indices
 
-    def get_color_correction(self, frame):
-        if self._last_colors is None:
-            return array([1, 1, 1])
-        sent_colors = array([self._last_colors[i] for i, *_ in self.check_indices])
-        seen_colors = array([frame[y][x] for _, y, x in self.check_indices])
-        sent_weights = sum(sent_colors.T)
-        seen_weights = sum(seen_colors.T)
-        combined_weights = sent_weights * seen_weights
-        sent_avg = average(sent_colors, weights=combined_weights, axis=0)
-        seen_avg = average(seen_colors, weights=combined_weights, axis=0)
-        if all(seen_avg):
-            factors = sent_avg / seen_avg
-            factors /= max(factors)
-            weight = sum(combined_weights)
-            if (
-                not any(self.last_wb_weights)
-                or weight / max(self.last_wb_weights) > 0.2
-            ):
-                self.last_wb_weights.append(weight)
-                self.last_wb_corrections.append(factors)
-                self.wb_correction = average(
-                    self.last_wb_corrections,
-                    weights=self.last_wb_weights,
-                    axis=0,
-                )
-        return self.wb_correction
-
     def get_colors(self) -> Iterable[BGRColor]:
+        if not self.tv.is_on:
+            self.tv.dt = 1
+            if self.tv_was_on:
+                self.camera.disconnect()
+                self.tv_was_on = False
+            sleep(30)
+            return [(0, 0, 0)] * len(self.indices)
+        elif not self.tv_was_on:
+            self.tv.dt = 60
+            self.camera.connect()
+            sleep(2)
         frame = self.camera.get_frame()
-
-        if config.blur:
-            frame = cv2.GaussianBlur(frame, (config.blur, config.blur), 0)
         colors = array([frame[y][x] for y, x in self.indices])
 
-        if self.auto_wb:
-            wb_correction_ = self.get_color_correction(frame)
-            if config.auto_wb:
-                colors *= wb_correction_
         if config.colors is not None:
             weights = array([config.colors.get(c, 1) for c in ['blue', 'green', 'red']])
             weights = weights / weights.max() * config.colors.get('brightness', 1)

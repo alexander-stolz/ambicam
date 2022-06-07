@@ -1,5 +1,7 @@
 import json
-from types import SimpleNamespace
+import subprocess
+import threading
+from time import sleep
 
 
 class AttrDict(dict):
@@ -8,8 +10,6 @@ class AttrDict(dict):
 
     def __getattr__(self, attr):
         attr = self.get(attr)
-        # if isinstance(attr, dict):
-        #     return AttrDict(attr)
         return attr
 
     def __setattr__(self, key, value):
@@ -35,10 +35,47 @@ class AttrDict(dict):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
+class TV(threading.Thread):
+    _is_on = None
+
+    def __init__(self, host=None, dt=60):
+        super().__init__()
+        self.host = host
+        self.dt = dt
+        if host is None:
+            # if tv:host not in config -> always return True
+            self._is_on = True
+            return
+        self.start()
+
+    def ping(self):
+        self._is_on = subprocess.call(['ping', '-c', '1', '-w1', self.host]) == 0
+        return self._is_on
+
+    def run(self):
+        self.running = True
+        while self.running:
+            self.ping()
+            sleep(self.dt)
+
+    def stop(self):
+        self.running = False
+
+    @property
+    def is_on(self):
+        if self._is_on is None:
+            self.ping()
+        if self._is_on:
+            self.dt = 60
+            return True
+        self.dt = 10
+        return False
+
+
 def get_config(filename='config.json'):
     with open(filename) as f:
-        config = json.load(f)
-    return AttrDict(**config)
+        config = json.load(f, object_hook=AttrDict)
+    return config
 
 
 def save_config(data=None, filename='config.json'):
