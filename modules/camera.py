@@ -67,7 +67,7 @@ class Cv2Camera(AbstractCamera):
 
     def get_frame(self):
         success, frame = self.vid.read()
-        frame = ndarray.astype(frame, dtype=float)
         if success:
+            frame = ndarray.astype(frame, dtype=float)
             self._frame = frame
         return self._frame

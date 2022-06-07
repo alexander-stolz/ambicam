@@ -93,11 +93,11 @@ class CameraGrabber(ColorGrabber):
     _check_indices = None
     _last_colors = None
     auto_wb = False
+    is_paused = False
     wb_queue_size = 30
     wb_correction = array([1, 1, 1])
     last_wb_corrections = deque(maxlen=150)
     last_wb_weights = deque(maxlen=150)
-    tv_was_on = False
 
     def initialize(self):
         log.debug('connect camera')
@@ -105,6 +105,7 @@ class CameraGrabber(ColorGrabber):
             os.system(f'v4l2-ctl --set-ctrl={property}={value}')
         self.camera = Camera()
         self.camera.connect()
+        self.is_paused = False
         self.tv = TV(host=config.tv.host, dt=1)
         self.last_wb_corrections = deque(maxlen=config.colors.get('queueSize', 150))
         self.last_wb_weights = deque(maxlen=config.colors.get('queueSize', 150))
@@ -135,6 +136,8 @@ class CameraGrabber(ColorGrabber):
         self._frame = frame
 
     def save_frame(self, filepath):
+        if self.is_paused:
+            return
         cv2.imwrite(filepath, self.frame)
 
     def stream(self):
@@ -217,17 +220,21 @@ class CameraGrabber(ColorGrabber):
         self._indices = indices
 
     def get_colors(self) -> Iterable[BGRColor]:
+        # turn camera on if tv is on, else turn off and wait.
         if not self.tv.is_on:
-            self.tv.dt = 1
-            if self.tv_was_on:
+            if not self.is_paused:
+                log.debug('tv is off. disconnect camera.')
                 self.camera.disconnect()
-                self.tv_was_on = False
-            sleep(30)
+                self.is_paused = True
+            sleep(1)
             return [(0, 0, 0)] * len(self.indices)
-        elif not self.tv_was_on:
-            self.tv.dt = 60
+        elif self.is_paused:
+            log.debug('tv is on. reconnect camera.')
             self.camera.connect()
-            sleep(2)
+            while self.camera.get_frame() is None:
+                sleep(1)
+            self.is_paused = False
+
         frame = self.camera.get_frame()
         colors = array([frame[y][x] for y, x in self.indices])
 
@@ -245,6 +252,7 @@ class CameraGrabber(ColorGrabber):
 
     def teardown(self):
         self.camera.disconnect()
+        self.tv.stop()
         self._frame = None
         self._indices = None
 

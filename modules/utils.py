@@ -66,9 +66,9 @@ class TV(threading.Thread):
         if self._is_on is None:
             self.ping()
         if self._is_on:
-            self.dt = 60
+            self.dt = 30
             return True
-        self.dt = 10
+        self.dt = 2
         return False
 
 
