@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 from math import sqrt
 import os
@@ -223,13 +224,19 @@ class CameraGrabber(ColorGrabber):
         # turn camera on if tv is on, else turn off and wait.
         if not self.tv.is_on:
             if not self.is_paused:
-                log.debug('tv is off. disconnect camera.')
+                log.debug(
+                    '[%s] tv is off. disconnect camera.',
+                    datetime.now().strftime('%H:%M:%S'),
+                )
                 self.camera.disconnect()
                 self.is_paused = True
             sleep(1)
             return [(0, 0, 0)] * len(self.indices)
         elif self.is_paused:
-            log.debug('tv is on. reconnect camera.')
+            log.debug(
+                '[%s] tv is on. reconnect camera.',
+                datetime.now().strftime('%H:%M:%S'),
+            )
             self.camera.connect()
             while self.camera.get_frame() is None:
                 sleep(1)
